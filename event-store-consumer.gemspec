@@ -6,7 +6,7 @@ Gem::Specification.new do |s|
 
   s.authors = ['The Eventide Project']
   s.email = 'opensource@eventide-project.org'
-  s.homepage = 'https://github.com/obsidian-btc/event-store-consumer'
+  s.homepage = 'https://github.com/eventide-project/event-store-consumer'
   s.licenses = ['MIT']
 
   s.require_paths = ['lib']
