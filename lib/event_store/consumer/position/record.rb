@@ -33,11 +33,16 @@ module EventStore
         def call(event_data)
           position = event_data.position
 
-          if interval? position
-            write.(position)
+          logger.opt_trace "Recording stream position (StreamName: #{write.stream_name.inspect}, Position: #{position.inspect})"
 
+          if interval? position
+            previous_position = write.(position)
+
+            logger.opt_debug "Recorded stream position (StreamName: #{write.stream_name.inspect}, Position: #{position.inspect}, PreviousPosition: #{previous_position.inspect})"
             true
           else
+
+            logger.opt_debug "Did not record stream position (StreamName: #{write.stream_name.inspect}, Position: #{position.inspect})"
             false
           end
         end

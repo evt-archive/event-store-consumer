@@ -34,15 +34,18 @@ module EventStore
         end
 
         def call(position)
-          logger.trace "Updating stream position (Stream Name: #{stream_name.inspect}, Position: #{position})"
+          logger.trace "Updating stream position (StreamName: #{stream_name.inspect}, Position: #{position.inspect})"
+
+          previous_position = nil
 
           update_stream_metadata.() do |metadata|
+            previous_position = metadata[:consumer_position]
             metadata[:consumer_position] = position
           end
 
-          logger.debug "Updated stream position (Stream Name: #{stream_name.inspect}, Position: #{position})"
+          logger.debug "Updated stream position (StreamName: #{stream_name.inspect}, Position: #{position.inspect}, PreviousPosition: #{previous_position.inspect})"
 
-          position
+          previous_position
         end
       end
     end
