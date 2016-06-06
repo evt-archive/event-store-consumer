@@ -15,7 +15,7 @@ module EventStore
         @dispatcher_class = dispatcher_class
       end
 
-      def self.build(stream_name, dispatcher_class, session: session)
+      def self.build(stream_name, dispatcher_class, session: nil)
         receiver = Consumer.new
 
         instance = new receiver, stream_name, dispatcher_class
@@ -27,7 +27,7 @@ module EventStore
         instance
       end
 
-      def self.call(stream_name, dispatcher_class, session: session)
+      def self.call(stream_name, dispatcher_class, session: nil)
         instance = build stream_name, dispatcher_class, session: session
         instance.()
       end
