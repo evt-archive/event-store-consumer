@@ -1,3 +1,5 @@
+require 'configure'; Configure.activate
+
 require 'event_store/messaging'
 
 require 'event_store/consumer/position/read'

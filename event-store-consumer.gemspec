@@ -13,9 +13,10 @@ Gem::Specification.new do |s|
   s.files = Dir.glob '{lib}/**/*'
   s.platform = Gem::Platform::RUBY
 
-  s.add_runtime_dependency 'event_store-messaging', '~> 0'
-  s.add_runtime_dependency 'serialize', '~> 0'
+  s.add_runtime_dependency 'configure'
+  s.add_runtime_dependency 'event_store-messaging'
+  s.add_runtime_dependency 'serialize'
 
-  s.add_development_dependency 'process_host', '~> 0'
-  s.add_development_dependency 'test_bench', '~> 0'
+  s.add_development_dependency 'process_host'
+  s.add_development_dependency 'test_bench'
 end
