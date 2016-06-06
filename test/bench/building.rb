@@ -46,4 +46,18 @@ context "Building a consumer" do
       assert consumer.subscription.starting_position == control_position
     end
   end
+
+  context "Supplying a session" do
+    session = Object.new
+
+    consumer = EventStore::Consumer::Build.(stream_name, dispatcher_class, session: session)
+
+    test "Consumer session is set" do
+      assert consumer.session == session
+    end
+
+    test "Subscription session is set" do
+      assert consumer.session == session
+    end
+  end
 end

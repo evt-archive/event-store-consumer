@@ -6,6 +6,8 @@ module EventStore
       attr_reader :stream_name
 
       dependency :logger, Telemetry::Logger
+      dependency :session, EventStore::Client::HTTP::Session
+      dependency :settings, Settings
 
       def initialize(receiver, stream_name, dispatcher_class)
         @receiver = receiver
@@ -13,42 +15,59 @@ module EventStore
         @dispatcher_class = dispatcher_class
       end
 
-      def self.build(stream_name, dispatcher_class)
+      def self.build(stream_name, dispatcher_class, session: session)
         receiver = Consumer.new
 
         instance = new receiver, stream_name, dispatcher_class
 
         Telemetry::Logger.configure instance
+        EventStore::Client::HTTP::Session.configure instance, session: session
+        Settings.configure instance
 
         instance
       end
 
-      def self.call(stream_name, dispatcher_class)
-        instance = build stream_name, dispatcher_class
+      def self.call(stream_name, dispatcher_class, session: session)
+        instance = build stream_name, dispatcher_class, session: session
         instance.()
       end
 
       def call
         logger.trace "Building consumer (Stream Name: #{stream_name.inspect}, Dispatcher Type: #{dispatcher_class.name})"
 
-        dispatcher = dispatcher_class.configure receiver
-
-        Telemetry::Logger.configure receiver
-
-        session = EventStore::Client::HTTP::Session.configure receiver
-
-        configure_subscription dispatcher, session
-
-        update_interval = Settings.get :position_update_interval
-        Position::Record.configure receiver, stream_name, update_interval, session: session
+        configure_logger
+        configure_position_recorder
+        configure_session
+        configure_subscription
 
         logger.trace "Built consumer (Stream Name: #{stream_name.inspect}, Dispatcher Type: #{dispatcher_class.name})"
 
         receiver
       end
 
-      def configure_subscription(dispatcher, session)
-        position = Position::Read.(stream_name, session: session)
+      def configure_logger
+        Telemetry::Logger.configure receiver
+      end
+
+      def configure_position_recorder
+        update_interval = Settings.get :position_update_interval
+
+        Position::Record.configure(
+          receiver,
+          stream_name,
+          update_interval,
+          session: session
+        )
+      end
+
+      def configure_session
+        EventStore::Client::HTTP::Session.configure receiver, session: session
+      end
+
+      def configure_subscription
+        dispatcher = dispatcher_class.configure receiver
+
+        position = Position::Read.(stream_name)
 
         Messaging::Subscription.configure(
           receiver,
