@@ -67,7 +67,7 @@ module EventStore
       def configure_subscription
         dispatcher = dispatcher_class.configure receiver
 
-        position = Position::Read.(stream_name)
+        position = Position::Read.(stream_name, session: session)
 
         Messaging::Subscription.configure(
           receiver,
