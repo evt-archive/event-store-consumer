@@ -2,6 +2,7 @@ module EventStore
   class Consumer
     class Build
       attr_reader :dispatcher_class
+      attr_reader :name
       attr_reader :receiver
       attr_reader :stream_name
 
@@ -9,16 +10,17 @@ module EventStore
       dependency :session, EventStore::Client::HTTP::Session
       dependency :settings, Settings
 
-      def initialize(receiver, stream_name, dispatcher_class)
+      def initialize(receiver, stream_name, dispatcher_class, name=nil)
         @receiver = receiver
         @stream_name = stream_name
         @dispatcher_class = dispatcher_class
+        @name = name
       end
 
-      def self.build(stream_name, dispatcher_class, session: nil)
+      def self.build(stream_name, dispatcher_class, name: nil, session: nil)
         receiver = Consumer.new
 
-        instance = new receiver, stream_name, dispatcher_class
+        instance = new receiver, stream_name, dispatcher_class, name
 
         Telemetry::Logger.configure instance
         EventStore::Client::HTTP::Session.configure instance, session: session
@@ -27,8 +29,8 @@ module EventStore
         instance
       end
 
-      def self.call(stream_name, dispatcher_class, session: nil)
-        instance = build stream_name, dispatcher_class, session: session
+      def self.call(stream_name, dispatcher_class, name: nil, session: nil)
+        instance = build stream_name, dispatcher_class, name: name, session: session
         instance.()
       end
 
@@ -56,6 +58,7 @@ module EventStore
           receiver,
           stream_name,
           update_interval,
+          metadata_prefix: name,
           session: session
         )
       end
@@ -67,7 +70,7 @@ module EventStore
       def configure_subscription
         dispatcher = dispatcher_class.configure receiver
 
-        position = Position::Read.(stream_name, session: session)
+        position = Position::Read.(stream_name, metadata_prefix: name, session: session)
 
         Messaging::Subscription.configure(
           receiver,
