@@ -2,6 +2,8 @@ module EventStore
   class Consumer
     module Position
       class Record
+        configure :record_position
+
         attr_writer :update_interval
 
         dependency :logger, Telemetry::Logger
@@ -15,18 +17,10 @@ module EventStore
           @update_interval = update_interval
         end
 
-        def self.build(stream_name, update_interval=nil, session: nil)
+        def self.build(stream_name, update_interval=nil, metadata_prefix: nil, session: nil)
           instance = new update_interval
           Telemetry::Logger.configure instance
-          Write.configure instance, stream_name, session: session, attr_name: :write
-          instance
-        end
-
-        def self.configure(receiver, stream_name, update_interval=nil, session: nil, attr_name: nil)
-          attr_name ||= :record_position
-
-          instance = build stream_name, update_interval, session: session
-          receiver.public_send "#{attr_name}=", instance
+          Write.configure instance, stream_name, metadata_prefix: metadata_prefix, session: session, attr_name: :write
           instance
         end
 
@@ -52,11 +46,9 @@ module EventStore
           cycle.zero?
         end
 
-        module Defaults
-          module UpdateInterval
-            def self.get
-              100
-            end
+        module Assertions
+          def metadata_prefix?(prefix)
+            write.metadata_key == "#{prefix}_consumer_position".to_sym
           end
         end
       end
