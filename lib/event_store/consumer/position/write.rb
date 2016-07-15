@@ -2,6 +2,8 @@ module EventStore
   class Consumer
     module Position
       class Write
+        configure :write_position
+
         attr_reader :metadata_key
         attr_reader :stream_name
 
@@ -27,14 +29,6 @@ module EventStore
         def self.call(stream_name, position, metadata_prefix: nil, session: nil)
           instance = build stream_name, metadata_prefix: metadata_prefix, session: session
           instance.(position)
-        end
-
-        def self.configure(receiver, stream_name, metadata_prefix: nil, attr_name: nil, session: nil)
-          attr_name ||= :write_position
-
-          instance = build stream_name, metadata_prefix: metadata_prefix, session: session
-          receiver.public_send "#{attr_name}=", instance
-          instance
         end
 
         def call(position)
