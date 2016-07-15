@@ -48,7 +48,7 @@ context "Building a consumer" do
   end
 
   context "Supplying a session" do
-    session = Object.new
+    session = EventStore::Client::HTTP::Session.build
 
     consumer = EventStore::Consumer::Build.(stream_name, dispatcher_class, session: session)
 
