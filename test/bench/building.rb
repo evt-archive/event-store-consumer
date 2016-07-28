@@ -38,7 +38,6 @@ context "Building a consumer" do
 
   context "Current stream position is in the middle" do
     control_position = EventStore::Consumer::Controls::Position.example
-
     stream_name = EventStore::Consumer::Controls::Writer.write stream_name, position: control_position
 
     consumer = EventStore::Consumer::Build.(stream_name, dispatcher_class)
@@ -59,25 +58,6 @@ context "Building a consumer" do
 
     test "Subscription session is set" do
       assert consumer.session == session
-    end
-  end
-
-  context "Specifying a consumer name" do
-    consumer_name = :some_name
-    control_position = EventStore::Consumer::Controls::Position.example
-    stream_name = EventStore::Consumer::Controls::Writer.write stream_name, position: control_position
-    EventStore::Consumer::Position::Write.(stream_name, control_position, metadata_prefix: consumer_name)
-
-    consumer = EventStore::Consumer::Build.(stream_name, dispatcher_class, name: consumer_name)
-
-    test "Name is used as prefix when updating position in stream metadata" do
-      assert consumer.record_position do
-        metadata_prefix? consumer_name
-      end
-    end
-
-    test "Name is used as prefix when reading starting position" do
-      assert consumer.subscription.starting_position == control_position
     end
   end
 end

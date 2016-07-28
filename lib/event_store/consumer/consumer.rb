@@ -6,8 +6,8 @@ module EventStore
     dependency :session, Client::HTTP
     dependency :subscription, Messaging::Subscription
 
-    def self.build(stream_name, dispatcher_class, name: nil, session: nil)
-      Build.(stream_name, dispatcher_class, name: name, session: session)
+    def self.build(stream_name, dispatcher_class, session: nil)
+      Build.(stream_name, dispatcher_class, session: session)
     end
 
     def start(&supplementary_action)

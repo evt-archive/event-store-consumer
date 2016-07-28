@@ -7,26 +7,9 @@ context "Writing the current stream position" do
 
     EventStore::Consumer::Position::Write.(stream_name, control_position)
 
-    test do
-      position = EventStore::Consumer::Position::Read.(stream_name)
+    position = EventStore::Consumer::Position::Read.(stream_name)
 
-      assert position == control_position
-    end
-  end
-
-  context "Metadata prefix is specified" do
-    metadata_prefix = :some_prefix
-    control_position = EventStore::Consumer::Controls::Position.example
-
-    stream_name = EventStore::Consumer::Controls::Writer.write
-
-    EventStore::Consumer::Position::Write.(stream_name, control_position, metadata_prefix: metadata_prefix)
-
-    test do
-      position = EventStore::Consumer::Position::Read.(stream_name, metadata_prefix: metadata_prefix)
-
-      assert position == control_position
-    end
+    assert position == control_position
   end
 
   context "Configuration" do

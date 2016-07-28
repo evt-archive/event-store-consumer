@@ -17,10 +17,10 @@ module EventStore
           @update_interval = update_interval
         end
 
-        def self.build(stream_name, update_interval=nil, metadata_prefix: nil, session: nil)
+        def self.build(stream_name, update_interval=nil, session: nil)
           instance = new update_interval
           Telemetry::Logger.configure instance
-          Write.configure instance, stream_name, metadata_prefix: metadata_prefix, session: session, attr_name: :write
+          Write.configure instance, stream_name, session: session, attr_name: :write
           instance
         end
 
@@ -46,9 +46,11 @@ module EventStore
           cycle.zero?
         end
 
-        module Assertions
-          def metadata_prefix?(prefix)
-            write.metadata_key == "#{prefix}_consumer_position".to_sym
+        module Defaults
+          module UpdateInterval
+            def self.get
+              100
+            end
           end
         end
       end
