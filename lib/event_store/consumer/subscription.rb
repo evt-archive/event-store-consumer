@@ -51,6 +51,18 @@ module EventStore
         )
       end
 
+      handle EnqueueBatch do |enqueue_batch|
+        get_batch = GetBatch.new
+
+        SetAttributes.(
+          get_batch,
+          enqueue_batch,
+          copy: [{ :next_slice_uri => :slice_uri }]
+        )
+
+        get_batch
+      end
+
       def stream_reader
         @stream_reader ||= EventStore::Client::HTTP::StreamReader::Continuous.build(
           stream_name,

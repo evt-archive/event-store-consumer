@@ -1,9 +1,9 @@
 require_relative '../automated_init'
 
 context "Subscription, Get Batch is Handled and Stream Reader Returns Empty Batch" do
-  stream_name = Controls::Subscription::Write.(ending_position: 0)
+  stream_name = Controls::Subscription::Write.()
 
-  get_batch = Controls::Subscription::GetBatch.example stream_name, starting_position: 1
+  get_batch = Controls::Subscription::GetBatch.example stream_name, batch_index: 1
 
   subscription = EventStore::Consumer::Subscription.new stream_name
 

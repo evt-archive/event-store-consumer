@@ -5,7 +5,7 @@ module EventStore
         module Write
           def self.call(stream_name=nil, ending_position: nil)
             stream_name ||= StreamName.example random: true
-            ending_position ||= 2
+            ending_position ||= Batch.entry_count - 1
 
             writer = EventStore::Client::HTTP::EventWriter.build
 
