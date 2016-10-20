@@ -4,17 +4,25 @@ module EventStore
       include Actor
       include Log::Dependency
 
-      attr_writer :stream_reader
+      attr_writer :queue
+      attr_accessor :stream_reader
+      attr_accessor :session
 
       dependency :get_position, Position::Get
-      dependency :session, EventStore::Client::HTTP::Session
 
-      initializer :stream_name, a(:session, nil)
+      initializer :stream_name
 
-      def configure
-        Position::Get.configure self, stream_name
-        self.kernel = Kernel
-        EventStore::Client::HTTP::Session.configure self
+      def self.build(stream_name, queue: nil, session: nil)
+        instance = new stream_name
+
+        instance.kernel = Kernel
+        instance.queue = queue
+        instance.session = session
+
+        Position::Get.configure instance, stream_name
+        EventStore::Client::HTTP::Session.configure instance, session: session
+
+        instance
       end
 
       handle Actor::Messages::Start do
@@ -52,14 +60,12 @@ module EventStore
       end
 
       handle EnqueueBatch do |enqueue_batch|
+        enqueue_batch.entries.each do |event_data|
+          queue.enq event_data
+        end
+
         get_batch = GetBatch.new
-
-        SetAttributes.(
-          get_batch,
-          enqueue_batch,
-          copy: [{ :next_slice_uri => :slice_uri }]
-        )
-
+        get_batch.slice_uri = enqueue_batch.next_slice_uri
         get_batch
       end
 
@@ -86,6 +92,10 @@ module EventStore
 
       def kernel
         @kernel ||= Actor::Substitutes::Kernel.new
+      end
+
+      def queue
+        @queue ||= Queue.new
       end
 
       def starting_position

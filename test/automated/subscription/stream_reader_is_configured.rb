@@ -17,7 +17,8 @@ context "Subscription, Stream Reader is Configured" do
   context "Session is supplied to subscription" do
     session = EventStore::Client::HTTP::Session.build
 
-    subscription = EventStore::Consumer::Subscription.new stream_name, session
+    subscription = EventStore::Consumer::Subscription.new stream_name
+    subscription.session = session
 
     test "Session of subscription is supplied to stream reader" do
       assert subscription.stream_reader do |stream_reader|

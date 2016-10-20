@@ -24,13 +24,13 @@ module Fixtures
         attribute_names.each do |attr_name|
           next if exclude.include? attr_name
 
-          if control.nil?
-            control_value = nil
-          else
-            control_value = control.public_send attr_name
-          end
+          control_value = control.public_send attr_name
 
-          compare_value = compare.public_send attr_name
+          if compare.nil?
+            compare_value = nil
+          else
+            compare_value = compare.public_send attr_name
+          end
 
           test "Value of #{attr_name.inspect} matches" do
             comment "Control value: #{control_value.inspect}"
@@ -43,7 +43,7 @@ module Fixtures
     end
 
     def attribute_names
-      @attribute_names ||= compare.class.attribute_names
+      @attribute_names ||= control.class.attribute_names
     end
 
     def description
