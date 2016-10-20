@@ -9,12 +9,6 @@ module EventStore
             end
           end
 
-          module Position
-            def self.example
-              1
-            end
-          end
-
           module Write
             def self.example(position: nil)
               position ||= Position.example

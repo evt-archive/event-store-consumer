@@ -4,6 +4,8 @@ module EventStore
       class Get
         include Log::Dependency
 
+        configure :get_position
+
         initializer :stream_name
 
         dependency :reader, EventStore::Client::HTTP::Reader
@@ -54,6 +56,24 @@ module EventStore
 
         def log_attributes
           "StreamName: #{stream_name}"
+        end
+
+        module Substitute
+          def self.build
+            Get.new
+          end
+
+          class Get
+            attr_writer :position
+
+            def call
+              position
+            end
+
+            def position
+              @position ||= :no_stream
+            end
+          end
         end
       end
     end
