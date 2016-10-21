@@ -40,7 +40,9 @@ module EventStore
           logger.trace "Getting stream position (#{log_attributes})"
 
           reader.each do |event_data|
-            position = event_data.data[:position]
+            consumer_updated = build_consumer_updated event_data
+
+            position = consumer_updated.position
 
             logger.debug "Get stream position done (#{log_attributes}, Position: #{position})"
 
@@ -52,6 +54,13 @@ module EventStore
           logger.debug "Get stream position done (#{log_attributes}, Position: :no_stream)"
 
           return :no_stream
+        end
+
+        def build_consumer_updated(event_data)
+          EventStore::Messaging::Message::Import::EventData.(
+            event_data,
+            ConsumerUpdated
+          )
         end
 
         def log_attributes

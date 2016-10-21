@@ -8,10 +8,10 @@ module EventStore
 
             consumer_stream_name = Consumer::StreamName.consumer_stream_name stream_name
 
-            writer = EventStore::Client::HTTP::EventWriter.build
-            event_data = EventData::Write.example position: position
+            message = ConsumerUpdated.example position: position
 
-            writer.write event_data, consumer_stream_name
+            writer = EventStore::Messaging::Writer.build
+            writer.write message, consumer_stream_name
 
             stream_name
           end
