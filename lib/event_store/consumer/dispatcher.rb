@@ -38,7 +38,6 @@ module EventStore
 
         if queue.empty?
           logger.debug "Queue is empty; retrying (#{log_attributes})"
-          sleep 0.1
           return dequeue_batch
         end
 
