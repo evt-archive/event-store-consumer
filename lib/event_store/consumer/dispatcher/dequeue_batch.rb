@@ -1,7 +1,7 @@
 module EventStore
   module Consumer
     class Dispatcher
-      class GetBatch
+      class DequeueBatch
         include Actor::Messaging::Message
       end
     end

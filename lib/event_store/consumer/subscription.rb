@@ -26,9 +26,15 @@ module EventStore
       end
 
       handle Actor::Messages::Start do
-        slice_uri = stream_reader.start_path
+        start_path = stream_reader.start_path
 
-        GetBatch.build :slice_uri => slice_uri
+        logger.trace "Configuring initial batch (#{log_attributes}, StartPath: #{start_path})"
+
+        get_batch = GetBatch.build :slice_uri => start_path
+
+        logger.debug "Initial batch configured (#{log_attributes}, StartPath: #{start_path})"
+
+        get_batch
       end
 
       handle GetBatch do |get_batch|

@@ -1,7 +1,7 @@
 require_relative '../automated_init'
 
-context "Dispatcher, Start Message is Handled" do
-  message = Actor::Messages::Start.new
+context "Dispatcher, DequeueBatch is Handled and Queue is Empty" do
+  message = Controls::Dispatcher::DequeueBatch.example
 
   dispatcher = EventStore::Consumer::Dispatcher.new
 

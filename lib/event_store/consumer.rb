@@ -4,10 +4,11 @@ require 'initializer' ; Initializer.activate
 require 'log'
 
 require 'event_store/client/http'
+require 'event_store/messaging'
 
 require 'event_store/consumer/log'
 require 'event_store/consumer/position/get'
-require 'event_store/consumer/dispatcher/get_batch'
+require 'event_store/consumer/dispatcher/dequeue_batch'
 require 'event_store/consumer/dispatcher'
 require 'event_store/consumer/subscription/get_batch'
 require 'event_store/consumer/subscription/enqueue_batch'
