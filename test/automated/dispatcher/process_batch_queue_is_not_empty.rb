@@ -1,15 +1,15 @@
 require_relative '../automated_init'
 
-context "Dispatcher, DequeueBatch is Handled and Queue is Not Empty" do
-  message = Controls::Dispatcher::DequeueBatch.example
+context "Dispatcher, ProcessBatch is Handled and Queue is Not Empty" do
+  message = Controls::Dispatcher::ProcessBatch.example
 
   dispatcher = EventStore::Consumer::Dispatcher.new :stream
   batch = Controls::Subscription::Batch.enqueue dispatcher.queue
 
   next_message = dispatcher.handle message
 
-  test "DequeueBatch message is written to actor" do
-    assert next_message.instance_of?(Dispatcher::DequeueBatch)
+  test "ProcessBatch message is written to actor" do
+    assert next_message.instance_of?(Dispatcher::ProcessBatch)
   end
 
   context "Each event data in batch is dispatched" do

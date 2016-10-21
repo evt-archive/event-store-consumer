@@ -11,11 +11,7 @@ module EventStore
 
           def self.enqueue(queue)
             batch = example
-
-            batch.each do |event_data|
-              queue.enq event_data
-            end
-
+            queue.enq batch
             batch
           end
 

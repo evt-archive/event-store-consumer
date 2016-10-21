@@ -66,9 +66,9 @@ module EventStore
       end
 
       handle EnqueueBatch do |enqueue_batch|
-        enqueue_batch.entries.each do |event_data|
-          queue.enq event_data
-        end
+        entries = enqueue_batch.entries
+
+        queue.enq entries
 
         get_batch = GetBatch.new
         get_batch.slice_uri = enqueue_batch.next_slice_uri

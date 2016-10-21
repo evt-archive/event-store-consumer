@@ -2,9 +2,9 @@ module EventStore
   module Consumer
     module Controls
       module Dispatcher
-        module DequeueBatch
+        module ProcessBatch
           def self.example
-            Consumer::Dispatcher::DequeueBatch.new
+            Consumer::Dispatcher::ProcessBatch.new
           end
         end
       end

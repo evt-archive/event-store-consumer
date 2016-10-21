@@ -30,31 +30,28 @@ module EventStore
       end
 
       handle Actor::Messages::Start do
-        DequeueBatch.new
+        ProcessBatch.new
       end
 
-      handle DequeueBatch do |dequeue_batch|
+      handle ProcessBatch do |dequeue_batch|
         logger.trace "Dequeuing batch (#{log_attributes})"
 
-        batch_count = 0
+        if queue.empty?
+          logger.debug "Queue is empty; retrying (#{log_attributes})"
+          return dequeue_batch
+        end
 
-        event_data = nil
+        batch = queue.deq true
 
-        until queue.empty?
-          event_data = queue.deq true
-
-          batch_count += 1
-
+        batch.each do |event_data|
           message = dispatcher.build_message event_data
           dispatcher.dispatch message, event_data if message
         end
 
-        if event_data
-          position = get_position event_data
-          put_position.(position)
-        end
+        position = get_position batch.last
+        put_position.(position)
 
-        logger.trace "Dequeuing batch (#{log_attributes}, BatchCount: #{batch_count})"
+        logger.info "Batch processed (#{log_attributes}, BatchSize: #{batch.size}, Position: #{position})"
 
         dequeue_batch
       end

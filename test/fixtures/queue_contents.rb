@@ -14,10 +14,14 @@ module Fixtures
 
     def call
       context description do
+        begin
+          compare_batch = queue.deq true
+        rescue ThreadError
+        end
+
         control_batch.each_with_index do |control_entry, position|
-          begin
-            compare_entry = queue.deq true
-          rescue ThreadError
+          if compare_batch
+            compare_entry = compare_batch[position]
           end
 
           Fixtures::AttributeEquality.(
@@ -27,8 +31,8 @@ module Fixtures
           )
         end
 
-        test "Queue size matches control batch size" do
-          assert queue.empty?
+        test "Enqueued batch size matches control batch size" do
+          assert control_batch.size == compare_batch&.size
         end
       end
     end
