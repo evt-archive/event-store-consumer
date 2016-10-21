@@ -14,8 +14,6 @@ require 'test_bench'; TestBench.activate
 require 'event_store/consumer/controls'
 require_relative './fixtures/fixtures_init'
 
-require 'process_host'
-
 include EventStore::Consumer
 
 Consumer = EventStore::Consumer
