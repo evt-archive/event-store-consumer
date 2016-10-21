@@ -4,6 +4,8 @@ module EventStore
       class Put
         include Log::Dependency
 
+        configure :put_position
+
         initializer :stream_name
 
         dependency :session, EventStore::Client::HTTP::Session

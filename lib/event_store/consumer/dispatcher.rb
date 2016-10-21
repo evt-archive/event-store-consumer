@@ -5,16 +5,28 @@ module EventStore
       include Log::Dependency
 
       dependency :dispatcher, EventStore::Messaging::Dispatcher
+      dependency :put_position, Position::Put
 
       attr_writer :queue
 
-      def self.build(dipatcher_class, queue: nil)
-        dispatcher = dispatcher_class.build
+      initializer :stream_type
 
-        instance = new
-        instance.dispatcher = dispatcher
+      def self.build(stream_name, dipatcher_class, queue: nil)
+        stream_type = get_stream_type stream_name
+
+        instance = new stream_type
+        dispatcher_class.configure instance
+        PutPosition.configure instance, stream_name
         instance.queue = queue if queue
         instance
+      end
+
+      def self.get_stream_type(stream_name)
+        if StreamName.category? stream_name
+          :category
+        else
+          :stream
+        end
       end
 
       handle Actor::Messages::Start do
@@ -26,6 +38,8 @@ module EventStore
 
         batch_count = 0
 
+        event_data = nil
+
         until queue.empty?
           event_data = queue.deq true
 
@@ -35,9 +49,22 @@ module EventStore
           dispatcher.dispatch message, event_data if message
         end
 
+        if event_data
+          position = get_position event_data
+          put_position.(position)
+        end
+
         logger.trace "Dequeuing batch (#{log_attributes}, BatchCount: #{batch_count})"
 
         dequeue_batch
+      end
+
+      def get_position(event_data)
+        if stream_type == :category
+          event_data.position
+        else
+          event_data.number
+        end
       end
 
       def queue

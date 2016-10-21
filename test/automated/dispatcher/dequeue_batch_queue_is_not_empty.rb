@@ -3,7 +3,7 @@ require_relative '../automated_init'
 context "Dispatcher, DequeueBatch is Handled and Queue is Not Empty" do
   message = Controls::Dispatcher::DequeueBatch.example
 
-  dispatcher = EventStore::Consumer::Dispatcher.new
+  dispatcher = EventStore::Consumer::Dispatcher.new :stream
   batch = Controls::Subscription::Batch.enqueue dispatcher.queue
 
   next_message = dispatcher.handle message
@@ -19,6 +19,12 @@ context "Dispatcher, DequeueBatch is Handled and Queue is Not Empty" do
           dispatched? event_data
         end
       end
+    end
+  end
+
+  test "Consumer position is updated" do
+    assert dispatcher.put_position do
+      put?
     end
   end
 end

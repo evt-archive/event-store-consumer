@@ -3,7 +3,7 @@ require_relative '../automated_init'
 context "Dispatcher, Start Message is Handled" do
   message = Actor::Messages::Start.new
 
-  dispatcher = EventStore::Consumer::Dispatcher.new
+  dispatcher = EventStore::Consumer::Dispatcher.new :stream
 
   next_message = dispatcher.handle message
 
