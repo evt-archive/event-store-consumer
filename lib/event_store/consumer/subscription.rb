@@ -4,6 +4,7 @@ module EventStore
       include Actor
       include Log::Dependency
 
+      attr_writer :kernel
       attr_writer :queue
       attr_accessor :stream_reader
       attr_accessor :session
@@ -57,10 +58,12 @@ module EventStore
           return get_batch
         end
 
-        logger.debug "Get batch done (#{log_attributes}, EntryCount: #{entries.count})"
+        next_slice_uri = slice.next_uri :forward
+
+        logger.debug "Get batch done (#{log_attributes}, EntryCount: #{entries.count}, NextSliceUri: #{next_slice_uri})"
 
         EnqueueBatch.build(
-          :next_slice_uri => slice.next_uri(:forward),
+          :next_slice_uri => next_slice_uri,
           :entries => slice.entries.reverse
         )
       end

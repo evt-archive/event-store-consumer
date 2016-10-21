@@ -11,12 +11,12 @@ module EventStore
 
       initializer :stream_type
 
-      def self.build(stream_name, dipatcher_class, queue: nil)
+      def self.build(stream_name, dispatcher_class, queue: nil)
         stream_type = get_stream_type stream_name
 
         instance = new stream_type
         dispatcher_class.configure instance
-        PutPosition.configure instance, stream_name
+        Position::Put.configure instance, stream_name
         instance.queue = queue if queue
         instance
       end
@@ -38,6 +38,7 @@ module EventStore
 
         if queue.empty?
           logger.debug "Queue is empty; retrying (#{log_attributes})"
+          sleep 0.1
           return dequeue_batch
         end
 

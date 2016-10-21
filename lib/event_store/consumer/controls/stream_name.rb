@@ -21,8 +21,8 @@ module EventStore
         end
 
         module Category
-          def self.example
-            category = Controls::Category.example
+          def self.example(random: nil)
+            category = Controls::Category.example random: random
 
             EventStore::Client::StreamName.category_stream_name category
           end

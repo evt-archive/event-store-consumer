@@ -28,7 +28,7 @@ module EventStore
 
         module Type
           def self.example
-            "SomeEventType"
+            "ExampleMessage"
           end
         end
 
