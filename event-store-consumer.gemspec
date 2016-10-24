@@ -14,9 +14,11 @@ Gem::Specification.new do |s|
   s.platform = Gem::Platform::RUBY
 
   s.add_runtime_dependency 'configure'
+  s.add_runtime_dependency 'event_store-client-http'
   s.add_runtime_dependency 'event_store-messaging'
+  s.add_runtime_dependency 'log'
+  s.add_runtime_dependency 'ntl-actor'
   s.add_runtime_dependency 'serialize'
 
-  s.add_development_dependency 'process_host'
   s.add_development_dependency 'test_bench'
 end
