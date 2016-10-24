@@ -7,7 +7,7 @@ context "Dispatcher, Error is Raised While Handling ProcessBatch" do
     dispatcher = EventStore::Consumer::Dispatcher.new :stream
 
     Controls::Subscription::Batch.enqueue dispatcher.queue
-    Controls::Messaging::Dispatcher::Failure.configure dispatcher
+    Controls::Messaging::Dispatcher::Failure.configure dispatcher, attr_name: :messaging_dispatcher
 
     test "Error is not rescued" do
       assert proc { dispatcher.handle message } do
@@ -23,7 +23,7 @@ context "Dispatcher, Error is Raised While Handling ProcessBatch" do
     dispatcher.error_handler = proc { |_error| error = _error }
 
     Controls::Subscription::Batch.enqueue dispatcher.queue
-    Controls::Messaging::Dispatcher::Failure.configure dispatcher
+    Controls::Messaging::Dispatcher::Failure.configure dispatcher, attr_name: :messaging_dispatcher
 
     dispatcher.handle message
 

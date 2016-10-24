@@ -4,14 +4,21 @@ module EventStore
       return if cls == Object
 
       cls.class_exec do
+        include ::Log::Dependency
         include Module
 
-        extend CategoryMacro
         extend Build
+        extend CategoryMacro
         extend DispatcherMacro
+        extend Start
         extend StreamMacro
+        extend QueueSizeMacro
 
-        dependency :dispatcher, Dispatcher
+        dependency :session, EventStore::Client::HTTP::Session
+
+        attr_writer :stream_name
+
+        initializer :queue
       end
     end
 
@@ -20,12 +27,52 @@ module EventStore
         raise error
       end
 
+      def start
+        logger.trace "Starting consumer (StreamName: #{stream_name}, Dispatcher: #{messaging_dispatcher_class})"
+
+        error_handler = method(:handle_error).to_proc
+
+        _, subscription = Subscription.start(
+          stream_name,
+          queue: queue,
+          session: session,
+          include: :actor
+        )
+
+        _, dispatcher = Dispatcher.start(
+          stream_name,
+          messaging_dispatcher_class,
+          error_handler: error_handler,
+          queue: queue,
+          include: :actor
+        )
+
+        logger.info "Consumer started (StreamName: #{stream_name}, Dispatcher: #{messaging_dispatcher_class})"
+
+        return subscription, dispatcher
+      end
+
+      def messaging_dispatcher_class
+        self.class.messaging_dispatcher_class
+      end
+
       def stream_name
-        self.class.stream_name
+        @stream_name ||= self.class.stream_name
       end
 
       def consumer_stream_name
         StreamName.consumer_stream_name stream_name
+      end
+    end
+
+    module Build
+      def build(stream_name=nil, session: nil)
+        queue = SizedQueue.new default_queue_size
+
+        instance = new queue
+        instance.stream_name = stream_name if stream_name
+        EventStore::Client::HTTP::Session.configure instance, session: session
+        instance
       end
     end
 
@@ -40,23 +87,6 @@ module EventStore
       alias_method :category, :category_macro
     end
 
-    module Build
-      def build
-        instance = new
-
-        error_handler = instance.method(:handle_error).to_proc
-
-        Dispatcher.configure(
-          instance,
-          stream_name,
-          messaging_dispatcher_class,
-          error_handler: error_handler
-        )
-
-        instance
-      end
-    end
-
     module DispatcherMacro
       def dispatcher_macro(dispatcher_class)
         define_singleton_method :messaging_dispatcher_class do
@@ -64,6 +94,26 @@ module EventStore
         end
       end
       alias_method :dispatcher, :dispatcher_macro
+    end
+
+    module QueueSizeMacro
+      def queue_size_macro(size)
+        define_singleton_method :default_queue_size do
+          size
+        end
+      end
+      alias_method :queue_size, :queue_size_macro
+
+      def default_queue_size
+        Defaults.queue_size
+      end
+    end
+
+    module Start
+      def start(session: nil)
+        instance = build session: session
+        instance.start
+      end
     end
 
     module StreamMacro
@@ -75,6 +125,24 @@ module EventStore
         end
       end
       alias_method :stream, :stream_macro
+    end
+
+    module Defaults
+      def self.batch_size
+        batch_size = ENV['CONSUMER_DEFAULT_BATCH_SIZE']
+
+        return batch_size.to_i if batch_size
+
+        100
+      end
+
+      def self.queue_size
+        queue_size = ENV['CONSUMER_DEFAULT_QUEUE_SIZE']
+
+        return queue_size.to_i if queue_size
+
+        1_000
+      end
     end
   end
 end

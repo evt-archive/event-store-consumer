@@ -4,8 +4,6 @@ module EventStore
       include Actor
       include Log::Dependency
 
-      configure :dispatcher
-
       dependency :messaging_dispatcher, EventStore::Messaging::Dispatcher
       dependency :put_position, Position::Put
 

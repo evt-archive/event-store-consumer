@@ -10,10 +10,7 @@ module EventStore
           include EventStore::Consumer
 
           category Category.example
-          #dispatcher Dispatcher
-          #
-          #def handle_error(error)
-          #end
+          dispatcher Messaging::Dispatcher::Example
         end
       end
     end

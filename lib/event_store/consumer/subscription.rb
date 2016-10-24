@@ -120,16 +120,6 @@ module EventStore
       def log_attributes
         "StreamName: #{stream_name}, BatchSize: #{batch_size}"
       end
-
-      module Defaults
-        def self.batch_size
-          batch_size = ENV['CONSUMER_BATCH_SIZE']
-
-          return batch_size.to_if if batch_size
-
-          100
-        end
-      end
     end
   end
 end
