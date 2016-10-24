@@ -1,10 +1,13 @@
 require_relative '../automated_init'
 
-context "Consumer Default Error Handler" do
+context "Consumer Error Handler" do
   error = Controls::Error.example
 
   consumer_class = Class.new do
     include EventStore::Consumer
+
+    dispatcher Controls::Messaging::Dispatcher::Example
+    stream :some_stream
 
     attr_accessor :handled_error
 
@@ -16,12 +19,15 @@ context "Consumer Default Error Handler" do
       handled_error == error
     end
   end
-  consumer = consumer_class.new
 
-  context "Error handler is actuated" do
-    consumer.handle_error error
+  context "Consumer is constructed" do
+    consumer = consumer_class.build
 
-    test "Error is handled" do
+    dispatcher = consumer.dispatcher
+
+    test "Error handler is supplied to dispatcher" do
+      dispatcher.error_handler.(error)
+
       assert consumer.handled_error?(error)
     end
   end

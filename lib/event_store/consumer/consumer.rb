@@ -4,25 +4,29 @@ module EventStore
       return if cls == Object
 
       cls.class_exec do
+        include Module
+
         extend CategoryMacro
         extend Build
         extend DispatcherMacro
         extend StreamMacro
 
-        dependency :dispatcher, EventStore::Messaging::Dispatcher
+        dependency :dispatcher, Dispatcher
       end
     end
 
-    def handle_error(error)
-      raise error
-    end
+    module Module
+      def handle_error(error)
+        raise error
+      end
 
-    def stream_name
-      self.class.stream_name
-    end
+      def stream_name
+        self.class.stream_name
+      end
 
-    def consumer_stream_name
-      StreamName.consumer_stream_name stream_name
+      def consumer_stream_name
+        StreamName.consumer_stream_name stream_name
+      end
     end
 
     module CategoryMacro
@@ -39,14 +43,23 @@ module EventStore
     module Build
       def build
         instance = new
-        dispatcher_class.configure instance
+
+        error_handler = instance.method(:handle_error).to_proc
+
+        Dispatcher.configure(
+          instance,
+          stream_name,
+          messaging_dispatcher_class,
+          error_handler: error_handler
+        )
+
         instance
       end
     end
 
     module DispatcherMacro
       def dispatcher_macro(dispatcher_class)
-        define_singleton_method :dispatcher_class do
+        define_singleton_method :messaging_dispatcher_class do
           dispatcher_class
         end
       end

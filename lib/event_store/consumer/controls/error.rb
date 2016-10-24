@@ -6,7 +6,11 @@ module EventStore
           Example.new
         end
 
-        Example = Class.new StandardError
+        class Example < StandardError
+          def to_s
+            "Control error"
+          end
+        end
       end
     end
   end

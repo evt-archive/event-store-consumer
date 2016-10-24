@@ -12,6 +12,14 @@ module EventStore
             end
           end
 
+          class Failure
+            include EventStore::Messaging::Handler
+
+            handle Message::ExampleMessage do |msg|
+              raise Error.example
+            end
+          end
+
           class VerifySequence
             include ::Log::Dependency
             include EventStore::Messaging::Handler

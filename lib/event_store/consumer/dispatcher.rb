@@ -4,18 +4,22 @@ module EventStore
       include Actor
       include Log::Dependency
 
-      dependency :dispatcher, EventStore::Messaging::Dispatcher
+      configure :dispatcher
+
+      dependency :messaging_dispatcher, EventStore::Messaging::Dispatcher
       dependency :put_position, Position::Put
 
+      attr_writer :error_handler
       attr_writer :queue
 
       initializer :stream_type
 
-      def self.build(stream_name, dispatcher_class, queue: nil)
+      def self.build(stream_name, dispatcher_class, error_handler: nil, queue: nil)
         stream_type = get_stream_type stream_name
 
         instance = new stream_type
-        dispatcher_class.configure instance
+        dispatcher_class.configure instance, attr_name: :messaging_dispatcher
+        instance.error_handler = error_handler if error_handler
         Position::Put.configure instance, stream_name
         instance.queue = queue if queue
         instance
@@ -40,12 +44,10 @@ module EventStore
           logger.debug "Queue is empty; retrying (#{log_attributes})"
           return dequeue_batch
         end
-
         batch = queue.deq true
 
         batch.each do |event_data|
-          message = dispatcher.build_message event_data
-          dispatcher.dispatch message, event_data if message
+          dispatch event_data
         end
 
         position = get_position batch.last
@@ -56,6 +58,18 @@ module EventStore
         dequeue_batch
       end
 
+      def dispatch(event_data)
+        message = messaging_dispatcher.build_message event_data
+
+        return if message.nil?
+
+        begin
+          messaging_dispatcher.dispatch message, event_data
+        rescue => error
+          error_handler.(error)
+        end
+      end
+
       def get_position(event_data)
         if stream_type == :category
           event_data.position
@@ -64,17 +78,21 @@ module EventStore
         end
       end
 
+      def error_handler
+        @error_handler ||= proc { |error| raise error }
+      end
+
       def queue
         @queue ||= Queue.new
       end
 
       def log_attributes
-        "Dispatcher: #{dispatcher.class.name}"
+        "Dispatcher: #{messaging_dispatcher.class.name}"
       end
 
       module Assertions
         def dispatched?(event_data)
-          dispatcher.dispatched?(event_data)
+          messaging_dispatcher.dispatched?(event_data)
         end
       end
     end

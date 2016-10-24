@@ -14,7 +14,8 @@ module EventStore
             stream_position,
             data: data,
             position: global_position,
-            stream_name: stream_name
+            stream_name: stream_name,
+            type: type
           )
         end
 
