@@ -16,3 +16,5 @@ require 'event_store/consumer/subscription/get_batch'
 require 'event_store/consumer/subscription/enqueue_batch'
 require 'event_store/consumer/subscription'
 require 'event_store/consumer/stream_name'
+
+require 'event_store/consumer/consumer'

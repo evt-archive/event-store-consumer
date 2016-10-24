@@ -17,7 +17,7 @@ module EventStore
               )
             end
 
-            message = Consumer::Subscription::GetBatch.new
+            message = EventStore::Consumer::Subscription::GetBatch.new
             message.slice_uri = slice_uri
             message
           end

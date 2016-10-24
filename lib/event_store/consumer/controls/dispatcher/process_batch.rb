@@ -4,7 +4,7 @@ module EventStore
       module Dispatcher
         module ProcessBatch
           def self.example
-            Consumer::Dispatcher::ProcessBatch.new
+            EventStore::Consumer::Dispatcher::ProcessBatch.new
           end
         end
       end

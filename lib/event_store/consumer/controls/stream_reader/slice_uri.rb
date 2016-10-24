@@ -6,7 +6,7 @@ module EventStore
           def self.example(stream_name=nil, only_path: nil, starting_position: nil, slice_size: nil)
             stream_name ||= StreamName.example
             starting_position ||= Position::Initial.example
-            slice_size ||= Consumer::Subscription::Defaults.batch_size
+            slice_size ||= EventStore::Consumer::Subscription::Defaults.batch_size
 
             path = "/streams/#{stream_name}/#{starting_position}/forward/#{slice_size}"
 
