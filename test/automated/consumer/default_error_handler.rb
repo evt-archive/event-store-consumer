@@ -6,7 +6,8 @@ context "Consumer Default Error Handler" do
   consumer_class = Class.new do
     include EventStore::Consumer
   end
-  consumer = consumer_class.new
+
+  consumer = consumer_class.build
 
   context "Error handler is actuated" do
     test "Error is reraised" do

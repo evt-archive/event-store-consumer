@@ -20,10 +20,8 @@ context "Consumer Error Handler" do
     end
   end
 
-  context "Consumer is constructed" do
-    consumer = consumer_class.build
-
-    dispatcher = consumer.dispatcher
+  context "Consumer is started" do
+    consumer, _, dispatcher = consumer_class.start
 
     test "Error handler is supplied to dispatcher" do
       dispatcher.error_handler.(error)

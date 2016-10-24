@@ -4,6 +4,7 @@ module EventStore
       include Actor
       include Log::Dependency
 
+      attr_writer :batch_size
       attr_writer :kernel
       attr_writer :queue
       attr_accessor :stream_reader
@@ -13,9 +14,10 @@ module EventStore
 
       initializer :stream_name
 
-      def self.build(stream_name, queue: nil, session: nil)
+      def self.build(stream_name, queue: nil, batch_size: nil, session: nil)
         instance = new stream_name
 
+        instance.batch_size = batch_size if batch_size
         instance.kernel = Kernel
         instance.queue = queue
         instance.session = session

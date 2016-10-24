@@ -8,7 +8,7 @@ context "Consumer Stream Macro" do
       stream :some_stream
     end
 
-    consumer = consumer_class.new
+    consumer = consumer_class.build
 
     test "Specified value is converted to a camel cased stream name" do
       assert consumer.stream_name == 'someStream'
@@ -26,7 +26,7 @@ context "Consumer Stream Macro" do
       stream 'someStream-1'
     end
 
-    consumer = consumer_class.new
+    consumer = consumer_class.build
 
     test "Specified value is converted to a camel cased stream name" do
       assert consumer.stream_name == 'someStream-1'

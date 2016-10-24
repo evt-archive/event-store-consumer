@@ -7,6 +7,7 @@ module EventStore
         include ::Log::Dependency
         include Module
 
+        extend BatchSizeMacro
         extend Build
         extend CategoryMacro
         extend DispatcherMacro
@@ -23,6 +24,10 @@ module EventStore
     end
 
     module Module
+      def batch_size
+        self.class.default_batch_size
+      end
+
       def handle_error(error)
         raise error
       end
@@ -34,6 +39,7 @@ module EventStore
 
         _, subscription = Subscription.start(
           stream_name,
+          batch_size: batch_size,
           queue: queue,
           session: session,
           include: :actor
@@ -62,6 +68,19 @@ module EventStore
 
       def consumer_stream_name
         StreamName.consumer_stream_name stream_name
+      end
+    end
+
+    module BatchSizeMacro
+      def batch_size_macro(size)
+        define_singleton_method :default_batch_size do
+          size
+        end
+      end
+      alias_method :batch_size, :batch_size_macro
+
+      def default_batch_size
+        Defaults.batch_size
       end
     end
 
@@ -112,7 +131,10 @@ module EventStore
     module Start
       def start(session: nil)
         instance = build session: session
-        instance.start
+
+        actors = instance.start
+
+        return instance, *actors
       end
     end
 

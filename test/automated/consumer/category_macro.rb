@@ -7,7 +7,7 @@ context "Consumer Category Macro" do
     category :some_category
   end
 
-  consumer = consumer_class.new
+  consumer = consumer_class.build
 
   test "Specified value is converted to a camel cased category stream name" do
     assert consumer.stream_name == '$ce-someCategory'

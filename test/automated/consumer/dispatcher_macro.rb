@@ -8,12 +8,10 @@ context "Consumer Dispatcher Macro" do
     stream :some_stream
   end
 
-  context "Consumer is constructed" do
-    consumer = consumer_class.build
+  context "Consumer is started" do
+    _, _, dispatcher = consumer_class.start
 
     test "Dispatcher dependency is configured to use specfied messaging dispatcher" do
-      dispatcher = consumer.dispatcher
-
       assert dispatcher.messaging_dispatcher.instance_of?(Controls::Messaging::Dispatcher::Example)
     end
   end
