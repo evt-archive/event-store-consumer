@@ -5,7 +5,11 @@ module EventStore
 
       cls.class_exec do
         extend CategoryMacro
+        extend Build
+        extend DispatcherMacro
         extend StreamMacro
+
+        dependency :dispatcher, EventStore::Messaging::Dispatcher
       end
     end
 
@@ -26,6 +30,23 @@ module EventStore
         end
       end
       alias_method :category, :category_macro
+    end
+
+    module Build
+      def build
+        instance = new
+        dispatcher_class.configure instance
+        instance
+      end
+    end
+
+    module DispatcherMacro
+      def dispatcher_macro(dispatcher_class)
+        define_singleton_method :dispatcher_class do
+          dispatcher_class
+        end
+      end
+      alias_method :dispatcher, :dispatcher_macro
     end
 
     module StreamMacro
