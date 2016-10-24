@@ -8,12 +8,13 @@ module EventStore
         include Module
 
         extend BatchSizeMacro
-        extend Build
         extend CategoryMacro
         extend DispatcherMacro
-        extend Start
         extend StreamMacro
         extend QueueSizeMacro
+
+        extend Build
+        extend Start
 
         dependency :session, EventStore::Client::HTTP::Session
 
