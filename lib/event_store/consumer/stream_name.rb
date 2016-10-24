@@ -10,7 +10,11 @@ module EventStore
         else
           category, stream_id = split stream_name
 
-          "#{category}:consumer-#{stream_id}"
+          if stream_id.nil?
+            "#{category}:consumer"
+          else
+            "#{category}:consumer-#{stream_id}"
+          end
         end
       end
 

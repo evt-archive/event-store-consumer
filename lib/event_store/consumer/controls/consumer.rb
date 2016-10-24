@@ -7,9 +7,9 @@ module EventStore
         end
 
         class Example
-          include Consumer
+          include EventStore::Consumer
 
-          #stream StreamName.example
+          category Category.example
           #dispatcher Dispatcher
           #
           #def handle_error(error)

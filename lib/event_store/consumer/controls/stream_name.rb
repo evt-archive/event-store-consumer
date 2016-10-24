@@ -20,6 +20,20 @@ module EventStore
           end
         end
 
+        module Singleton
+          def self.example(random: nil)
+            Controls::Category.example 'someSingleton', random: random
+          end
+
+          module Consumer
+            def self.example
+              category = Singleton.example
+
+              "#{category}:consumer"
+            end
+          end
+        end
+
         module Category
           def self.example(random: nil)
             category = Controls::Category.example random: random
