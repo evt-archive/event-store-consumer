@@ -13,6 +13,10 @@ module EventStore
       end
     end
 
+    def handle_error(error)
+      raise error
+    end
+
     def stream_name
       self.class.stream_name
     end
