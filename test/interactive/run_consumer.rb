@@ -1,4 +1,4 @@
-require_relative './script_init'
+require_relative './interactive_init'
 
 module Fixtures
   class Consumer

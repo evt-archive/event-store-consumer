@@ -1,4 +1,4 @@
-require_relative './script_init'
+require_relative './interactive_init'
 
 stream_name = get_stream_name
 
