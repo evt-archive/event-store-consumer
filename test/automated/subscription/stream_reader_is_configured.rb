@@ -29,7 +29,7 @@ context "Subscription, Stream Reader is Configured" do
 
   context "Consumer position has been previously recorded" do
     subscription = EventStore::Consumer::Subscription.new stream_name
-    subscription.get_position.position = 11
+    subscription.position.get_position = 11
 
     stream_reader = subscription.stream_reader
 

@@ -1,7 +1,7 @@
 require_relative '../automated_init'
 
 context "Put Position, Substitute" do
-  substitute = SubstAttr::Substitute.build Position::Put
+  substitute = SubstAttr::Substitute.build Position
 
   context "Substitute is not actuated" do
     test "Put predicate returns false" do
@@ -14,7 +14,7 @@ context "Put Position, Substitute" do
   context "Substitute is actuated" do
     position = Controls::Position.example
 
-    substitute.(position)
+    substitute.put position
 
     context "Put predicate" do
       context "No arguments are supplied" do

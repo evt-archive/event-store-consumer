@@ -1,6 +1,6 @@
 module EventStore
   module Consumer
-    module Position
+    module Messages
       class ConsumerUpdated
         include EventStore::Messaging::Message
 

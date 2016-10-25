@@ -1,10 +1,10 @@
 require_relative '../automated_init'
 
 context "Get Starting Position, Substitute" do
-  substitute = SubstAttr::Substitute.build Position::Get
+  substitute = SubstAttr::Substitute.build Position
 
   context "Position is not specified" do
-    position = substitute.()
+    position = substitute.get
 
     test "No stream is returned" do
       assert position == :no_stream
@@ -12,9 +12,9 @@ context "Get Starting Position, Substitute" do
   end
 
   context "Position is specified" do
-    substitute.position = Controls::Position.example
+    substitute.get_position = Controls::Position.example
 
-    position = substitute.()
+    position = substitute.get
 
     test "Specified position is returned" do
       assert position == Controls::Position.example

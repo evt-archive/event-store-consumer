@@ -5,7 +5,7 @@ context "Put Consumer Position" do
 
   position = Controls::Position.example
 
-  Position::Put.(stream_name, position)
+  Position.put stream_name, position
 
   test "Position is written to consumer stream" do
     consumer_stream_name = StreamName.consumer_stream_name stream_name

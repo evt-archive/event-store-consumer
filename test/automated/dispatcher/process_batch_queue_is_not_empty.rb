@@ -23,7 +23,7 @@ context "Dispatcher, ProcessBatch is Handled and Queue is Not Empty" do
   end
 
   test "Consumer position is updated" do
-    assert dispatcher.put_position do
+    assert dispatcher.position do
       put?
     end
   end

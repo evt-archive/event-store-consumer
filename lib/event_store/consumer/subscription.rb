@@ -10,7 +10,7 @@ module EventStore
       attr_accessor :stream_reader
       attr_accessor :session
 
-      dependency :get_position, Position::Get
+      dependency :position, Position
 
       initializer :stream_name
 
@@ -22,7 +22,7 @@ module EventStore
         instance.queue = queue
         instance.session = session
 
-        Position::Get.configure instance, stream_name
+        Position.configure instance, stream_name
         EventStore::Client::HTTP::Session.configure instance, session: session
 
         instance
@@ -110,7 +110,7 @@ module EventStore
       end
 
       def starting_position
-        starting_position = get_position.()
+        starting_position = position.get
 
         if starting_position == :no_stream
           nil

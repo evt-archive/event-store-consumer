@@ -4,11 +4,11 @@ module EventStore
       include Actor
       include Log::Dependency
 
-      dependency :messaging_dispatcher, EventStore::Messaging::Dispatcher
-      dependency :put_position, Position::Put
-
       attr_writer :error_handler
       attr_writer :queue
+
+      dependency :messaging_dispatcher, EventStore::Messaging::Dispatcher
+      dependency :position, Position
 
       initializer :stream_type
 
@@ -18,7 +18,7 @@ module EventStore
         instance = new stream_type
         dispatcher_class.configure instance, attr_name: :messaging_dispatcher
         instance.error_handler = error_handler if error_handler
-        Position::Put.configure instance, stream_name
+        Position.configure instance, stream_name
         instance.queue = queue if queue
         instance
       end
@@ -48,10 +48,10 @@ module EventStore
           dispatch event_data
         end
 
-        position = get_position batch.last
-        put_position.(position)
+        next_starting_position = get_position batch.last
+        position.put next_starting_position
 
-        logger.info "Batch processed (#{log_attributes}, BatchSize: #{batch.size}, Position: #{position})"
+        logger.info "Batch processed (#{log_attributes}, BatchSize: #{batch.size}, NextStartingPosition: #{next_starting_position})"
 
         dequeue_batch
       end

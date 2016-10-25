@@ -6,7 +6,7 @@ module EventStore
           def self.example(position: nil)
             position ||= Position.example
 
-            consumer_updated = EventStore::Consumer::Position::ConsumerUpdated.new
+            consumer_updated = EventStore::Consumer::Messages::ConsumerUpdated.new
             consumer_updated.position = position
             consumer_updated
           end
