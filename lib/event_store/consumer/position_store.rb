@@ -11,14 +11,12 @@ module EventStore
           configure :position_store
 
           initializer :stream_name
+
+          virtual :configure
+
+          abstract :get
+          abstract :put
         end
-      end
-
-      def get
-        :no_stream
-      end
-
-      def put(position)
       end
 
       module Get
@@ -49,7 +47,9 @@ module EventStore
 
       module Build
         def build(stream_name)
-          new stream_name
+          instance = new stream_name
+          instance.configure
+          instance
         end
       end
     end
