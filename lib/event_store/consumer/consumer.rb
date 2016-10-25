@@ -10,6 +10,7 @@ module EventStore
         extend BatchSizeMacro
         extend CategoryMacro
         extend DispatcherMacro
+        extend PositionStoreMacro
         extend StreamMacro
         extend QueueSizeMacro
 
@@ -51,7 +52,8 @@ module EventStore
           messaging_dispatcher_class,
           error_handler: error_handler,
           queue: queue,
-          include: :actor
+          include: :actor,
+          position_store: position_store_class
         )
 
         logger.info "Consumer started (StreamName: #{stream_name}, Dispatcher: #{messaging_dispatcher_class})"
@@ -61,6 +63,10 @@ module EventStore
 
       def messaging_dispatcher_class
         self.class.messaging_dispatcher_class
+      end
+
+      def position_store_class
+        self.class.position_store_class
       end
 
       def stream_name
@@ -114,6 +120,19 @@ module EventStore
         end
       end
       alias_method :dispatcher, :dispatcher_macro
+    end
+
+    module PositionStoreMacro
+      attr_writer :position_store_class
+
+      def position_store_macro(position_store_class)
+        self.position_store_class = position_store_class
+      end
+      alias_method :position_store, :position_store_macro
+
+      def position_store_class
+        @position_store_class ||= PositionStore::ConsumerStream
+      end
     end
 
     module QueueSizeMacro

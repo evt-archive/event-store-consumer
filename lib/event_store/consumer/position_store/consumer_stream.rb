@@ -3,8 +3,7 @@ module EventStore
     module PositionStore
       class ConsumerStream
         include Log::Dependency
-
-        configure :position
+        include PositionStore
 
         initializer :stream_name
 
@@ -45,39 +44,23 @@ module EventStore
         end
 
         def get
-          log_attributes = "StreamName: #{stream_name}"
-          logger.trace "Getting stream position (#{log_attributes})"
-
           reader.each do |event_data|
             consumer_updated = EventStore::Messaging::Message::Import::EventData.(
               event_data,
               Messages::ConsumerUpdated
             )
 
-            position = consumer_updated.position
-
-            logger.debug "Get stream position done (#{log_attributes}, Position: #{position})"
-
-            return position
-
-            break
+            return consumer_updated.position
           end
-
-          logger.debug "Get stream position done (#{log_attributes}, Position: :no_stream)"
 
           return :no_stream
         end
 
         def put(position)
-          log_attributes = "StreamName: #{stream_name}, Position: #{position}"
-          logger.trace "Putting position (#{log_attributes})"
-
           message = Messages::ConsumerUpdated.build
           message.position = position
 
           writer.write message, stream_name
-
-          logger.debug "Put position done (#{log_attributes})"
 
           message
         end
