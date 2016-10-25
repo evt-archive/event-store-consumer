@@ -3,6 +3,8 @@ module EventStore
     module PositionStore
       def self.included(cls)
         cls.class_exec do
+          include Log::Dependency
+
           extend Build
 
           prepend Get

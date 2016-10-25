@@ -2,7 +2,6 @@ module EventStore
   module Consumer
     module PositionStore
       class ConsumerStream
-        include Log::Dependency
         include PositionStore
 
         initializer :stream_name
