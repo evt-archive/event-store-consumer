@@ -10,11 +10,11 @@ module EventStore
       attr_accessor :stream_reader
       attr_accessor :session
 
-      dependency :position, Position
+      dependency :position_store, PositionStore
 
       initializer :stream_name
 
-      def self.build(stream_name, queue: nil, batch_size: nil, session: nil)
+      def self.build(stream_name, queue: nil, batch_size: nil, position_store: nil, session: nil)
         instance = new stream_name
 
         instance.batch_size = batch_size if batch_size
@@ -22,7 +22,7 @@ module EventStore
         instance.queue = queue
         instance.session = session
 
-        Position.configure instance, stream_name
+        position_store.configure instance, stream_name if position_store
         EventStore::Client::HTTP::Session.configure instance, session: session
 
         instance
@@ -110,7 +110,7 @@ module EventStore
       end
 
       def starting_position
-        starting_position = position.get
+        starting_position = position_store.get
 
         if starting_position == :no_stream
           nil

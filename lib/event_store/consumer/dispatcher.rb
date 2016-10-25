@@ -8,17 +8,17 @@ module EventStore
       attr_writer :queue
 
       dependency :messaging_dispatcher, EventStore::Messaging::Dispatcher
-      dependency :position, Position
+      dependency :position_store, PositionStore
 
       initializer :stream_type
 
-      def self.build(stream_name, dispatcher_class, error_handler: nil, queue: nil)
+      def self.build(stream_name, dispatcher_class, error_handler: nil, queue: nil, position_store: nil)
         stream_type = get_stream_type stream_name
 
         instance = new stream_type
         dispatcher_class.configure instance, attr_name: :messaging_dispatcher
         instance.error_handler = error_handler if error_handler
-        Position.configure instance, stream_name
+        position_store.configure instance, stream_name if position_store
         instance.queue = queue if queue
         instance
       end
@@ -49,7 +49,7 @@ module EventStore
         end
 
         next_starting_position = get_position batch.last
-        position.put next_starting_position
+        position_store.put next_starting_position
 
         logger.info "Batch processed (#{log_attributes}, BatchSize: #{batch.size}, NextStartingPosition: #{next_starting_position})"
 

@@ -1,11 +1,11 @@
-require_relative '../automated_init'
+require_relative '../../automated_init'
 
-context "Put Consumer Position" do
+context "Consumer Stream Position Store, Put Operation" do
   stream_name = Controls::StreamName.example random: true
 
   position = Controls::Position.example
 
-  Position.put stream_name, position
+  PositionStore::ConsumerStream.put stream_name, position
 
   test "Position is written to consumer stream" do
     consumer_stream_name = StreamName.consumer_stream_name stream_name
