@@ -12,11 +12,11 @@ module EventStore
 
       initializer :stream_type
 
-      def self.build(stream_name, dispatcher_class, error_handler: nil, queue: nil, position_store: nil)
+      def self.build(stream_name, messaging_dispatcher, error_handler: nil, queue: nil, position_store: nil)
         stream_type = get_stream_type stream_name
 
         instance = new stream_type
-        dispatcher_class.configure instance, attr_name: :messaging_dispatcher
+        instance.messaging_dispatcher = messaging_dispatcher
         instance.error_handler = error_handler if error_handler
         position_store.configure instance, stream_name if position_store
         instance.queue = queue if queue

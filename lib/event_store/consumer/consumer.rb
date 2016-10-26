@@ -17,6 +17,7 @@ module EventStore
         extend Build
         extend Start
 
+        dependency :messaging_dispatcher, EventStore::Messaging::Dispatcher
         dependency :session, EventStore::Client::HTTP::Session
 
         attr_writer :stream_name
@@ -35,7 +36,7 @@ module EventStore
       end
 
       def start
-        logger.trace "Starting consumer (StreamName: #{stream_name}, Dispatcher: #{messaging_dispatcher_class})"
+        logger.trace "Starting consumer (StreamName: #{stream_name}, Dispatcher: #{messaging_dispatcher.class})"
 
         error_handler = method(:handle_error).to_proc
 
@@ -49,20 +50,16 @@ module EventStore
 
         _, dispatcher = Dispatcher.start(
           stream_name,
-          messaging_dispatcher_class,
+          messaging_dispatcher,
           error_handler: error_handler,
           queue: queue,
           include: :actor,
           position_store: position_store_class
         )
 
-        logger.info "Consumer started (StreamName: #{stream_name}, Dispatcher: #{messaging_dispatcher_class})"
+        logger.info "Consumer started (StreamName: #{stream_name}, Dispatcher: #{messaging_dispatcher.class})"
 
         return subscription, dispatcher
-      end
-
-      def messaging_dispatcher_class
-        self.class.messaging_dispatcher_class
       end
 
       def position_store_class
@@ -97,6 +94,7 @@ module EventStore
 
         instance = new queue
         instance.stream_name = stream_name if stream_name
+        messaging_dispatcher_class.configure instance, attr_name: :messaging_dispatcher
         EventStore::Client::HTTP::Session.configure instance, session: session
         instance
       end

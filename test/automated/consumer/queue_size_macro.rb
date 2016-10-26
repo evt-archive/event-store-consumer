@@ -5,6 +5,7 @@ context "Consumer Queue Size Macro" do
     include Consumer
 
     queue_size 111
+    dispatcher Controls::Messaging::Dispatcher::Example
     stream :some_stream
   end
 

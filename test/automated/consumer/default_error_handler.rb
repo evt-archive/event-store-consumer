@@ -5,6 +5,8 @@ context "Consumer Default Error Handler" do
 
   consumer_class = Class.new do
     include EventStore::Consumer
+
+    dispatcher Controls::Messaging::Dispatcher::Example
   end
 
   consumer = consumer_class.build

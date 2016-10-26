@@ -5,6 +5,7 @@ context "Consumer Category Macro" do
     include Consumer
 
     category :some_category
+    dispatcher Controls::Messaging::Dispatcher::Example
   end
 
   consumer = consumer_class.build
