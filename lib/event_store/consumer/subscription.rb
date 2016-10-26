@@ -21,8 +21,8 @@ module EventStore
         instance.kernel = Kernel
         instance.queue = queue
         instance.session = session
+        instance.position_store = position_store if position_store
 
-        position_store.configure instance, stream_name if position_store
         EventStore::Client::HTTP::Session.configure instance, session: session
 
         instance

@@ -16,10 +16,12 @@ module EventStore
         stream_type = get_stream_type stream_name
 
         instance = new stream_type
+
         instance.messaging_dispatcher = messaging_dispatcher
         instance.error_handler = error_handler if error_handler
-        position_store.configure instance, stream_name if position_store
+        instance.position_store = position_store if position_store
         instance.queue = queue if queue
+
         instance
       end
 

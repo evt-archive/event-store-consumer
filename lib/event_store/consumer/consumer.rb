@@ -18,6 +18,7 @@ module EventStore
         extend Start
 
         dependency :messaging_dispatcher, EventStore::Messaging::Dispatcher
+        dependency :position_store, PositionStore
         dependency :session, EventStore::Client::HTTP::Session
 
         attr_writer :stream_name
@@ -45,6 +46,7 @@ module EventStore
           batch_size: batch_size,
           queue: queue,
           session: session,
+          position_store: position_store,
           include: :actor
         )
 
@@ -54,16 +56,12 @@ module EventStore
           error_handler: error_handler,
           queue: queue,
           include: :actor,
-          position_store: position_store_class
+          position_store: position_store
         )
 
         logger.info "Consumer started (StreamName: #{stream_name}, Dispatcher: #{messaging_dispatcher.class})"
 
         return subscription, dispatcher
-      end
-
-      def position_store_class
-        self.class.position_store_class
       end
 
       def stream_name
@@ -93,9 +91,13 @@ module EventStore
         queue = SizedQueue.new default_queue_size
 
         instance = new queue
+
         instance.stream_name = stream_name if stream_name
+
+        position_store_class.configure instance, instance.stream_name
         messaging_dispatcher_class.configure instance, attr_name: :messaging_dispatcher
         EventStore::Client::HTTP::Session.configure instance, session: session
+
         instance
       end
     end
