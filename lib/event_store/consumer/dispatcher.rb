@@ -66,7 +66,12 @@ module EventStore
         begin
           messaging_dispatcher.dispatch message, event_data
         rescue => error
-          error_handler.(error)
+          _retry = false
+          retry_proc = proc { _retry = true }
+
+          error_handler.(error, retry_proc)
+
+          retry if _retry
         end
       end
 

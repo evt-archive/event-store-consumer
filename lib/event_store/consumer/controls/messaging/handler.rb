@@ -13,9 +13,12 @@ module EventStore
           end
 
           class Failure
+            include ::Log::Dependency
             include EventStore::Messaging::Handler
 
             handle Message::ExampleMessage do |msg|
+              logger.error "Raising error (MessageStreamPosition: #{msg.stream_position.inspect}, MessageGlobalPosition: #{msg.global_position.inspect})"
+
               raise Error.example
             end
           end

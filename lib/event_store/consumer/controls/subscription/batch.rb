@@ -3,19 +3,21 @@ module EventStore
     module Controls
       module Subscription
         module Batch
-          def self.example
-            (0...entry_count).map do |position|
+          def self.example(size=nil)
+            size ||= self.size
+
+            (0...size).map do |position|
               EventData.example stream_position: position
             end
           end
 
-          def self.enqueue(queue)
-            batch = example
+          def self.enqueue(queue, batch_size: nil)
+            batch = example batch_size
             queue.enq batch
             batch
           end
 
-          def self.entry_count
+          def self.size
             3
           end
         end

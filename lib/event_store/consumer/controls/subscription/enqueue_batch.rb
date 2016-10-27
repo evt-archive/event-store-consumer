@@ -4,7 +4,7 @@ module EventStore
       module Subscription
         module EnqueueBatch
           def self.example(stream_name=nil, entry_count: nil, starting_position: nil, starting_global_position: nil)
-            entry_count ||= Batch.entry_count
+            entry_count ||= Batch.size
             starting_position ||= Position::Initial.example
             starting_global_position ||= starting_position
 

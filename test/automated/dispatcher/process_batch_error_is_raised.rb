@@ -31,4 +31,23 @@ context "Dispatcher, Error is Raised While Handling ProcessBatch" do
       assert error.instance_of?(Controls::Error::Example)
     end
   end
+
+  context "Specified error handler retries" do
+    retry_count = 0
+
+    dispatcher = EventStore::Consumer::Dispatcher.new :stream
+    dispatcher.error_handler = proc { |_, retry_dispatch|
+      retry_count += 1
+      retry_dispatch.() unless retry_count == 3
+    }
+
+    Controls::Subscription::Batch.enqueue dispatcher.queue, batch_size: 1
+    Controls::Messaging::Dispatcher::Failure.configure dispatcher, attr_name: :messaging_dispatcher
+
+    dispatcher.handle message
+
+    test "Dispatcher is retried" do
+      assert retry_count == 3
+    end
+  end
 end

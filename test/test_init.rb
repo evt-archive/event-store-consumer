@@ -17,5 +17,3 @@ require_relative './fixtures/fixtures_init'
 include EventStore::Consumer
 
 Consumer = EventStore::Consumer
-
-Telemetry::Logger::AdHoc.activate

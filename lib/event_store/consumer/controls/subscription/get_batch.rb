@@ -9,7 +9,7 @@ module EventStore
             if batch_index == 0
               slice_uri = StreamReader::StartPath.example stream_name
             else
-              starting_position = batch_index * Batch.entry_count
+              starting_position = batch_index * Batch.size
 
               slice_uri = StreamReader::SliceURI.example(
                 stream_name,
