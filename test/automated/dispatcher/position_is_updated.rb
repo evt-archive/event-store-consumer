@@ -11,8 +11,10 @@ context "Dispatcher, Position is Updated" do
     dispatcher.handle message
 
     test "Consumer position is updated" do
+      control_position = Controls::Subscription::Batch::FinalPosition.example + 1
+
       assert dispatcher.position_store do
-        put? Controls::Subscription::Batch::FinalPosition.example
+        put? control_position
       end
     end
   end

@@ -13,6 +13,12 @@ context "Subscription, Get Batch is Handled and Stream Reader Returns Batch" do
     assert next_message.instance_of?(Subscription::EnqueueBatch)
   end
 
+  test "Actor thread is not delayed" do
+    refute subscription.kernel do
+      slept?
+    end
+  end
+
   Fixtures::EnqueueBatchEquality.(
     next_message,
     Controls::Subscription::EnqueueBatch.example(stream_name)

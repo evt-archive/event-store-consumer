@@ -5,6 +5,7 @@ module EventStore
       include Log::Dependency
 
       attr_writer :error_handler
+      attr_writer :kernel
       attr_writer :position_update_interval
       attr_writer :queue
 
@@ -18,10 +19,11 @@ module EventStore
 
         instance = new stream_type
 
-        instance.position_update_interval = position_update_interval
+        instance.kernel = Kernel
         instance.messaging_dispatcher = messaging_dispatcher
         instance.error_handler = error_handler if error_handler
         instance.position_store = position_store if position_store
+        instance.position_update_interval = position_update_interval
         instance.queue = queue if queue
 
         instance
@@ -44,6 +46,7 @@ module EventStore
 
         if queue.empty?
           logger.debug "Queue is empty; retrying (#{log_attributes})"
+          kernel.sleep Defaults.empty_queue_delay_seconds
           return dequeue_batch
         end
         batch = queue.deq true
@@ -102,6 +105,10 @@ module EventStore
 
       def error_handler
         @error_handler ||= proc { |error| raise error }
+      end
+
+      def kernel
+        @kernel ||= Actor::Substitutes::Kernel.new
       end
 
       def queue

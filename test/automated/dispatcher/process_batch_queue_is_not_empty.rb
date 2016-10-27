@@ -12,6 +12,12 @@ context "Dispatcher, ProcessBatch is Handled and Queue is Not Empty" do
     assert next_message.instance_of?(Dispatcher::ProcessBatch)
   end
 
+  test "Actor is not delayed" do
+    refute dispatcher.kernel do
+      slept?
+    end
+  end
+
   context "Each event data in batch is dispatched" do
     batch.each_with_index do |event_data, index|
       test "Event data ##{index + 1}" do

@@ -57,6 +57,7 @@ module EventStore
 
         if entries.empty?
           logger.debug "Get batch returned empty set; retrying (#{log_attributes})"
+          delay Defaults.empty_queue_delay_seconds
           return get_batch
         end
 
@@ -93,8 +94,10 @@ module EventStore
         @batch_size ||= Defaults.batch_size
       end
 
-      def delay
-        kernel.sleep delay_seconds
+      def delay(seconds=nil)
+        seconds ||= delay_seconds
+
+        kernel.sleep seconds
       end
 
       def delay_seconds

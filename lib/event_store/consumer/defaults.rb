@@ -9,6 +9,18 @@ module EventStore
         100
       end
 
+      def self.empty_queue_delay_seconds
+        @empty_queue_delay_seconds ||= Rational(empty_queue_delay_milliseconds, 1000)
+      end
+
+      def self.empty_queue_delay_milliseconds
+        delay = ENV['CONSUMER_EMPTY_QUEUE_DELAY_MILLISECONDS']
+
+        return delay.to_i if delay
+
+        100
+      end
+
       def self.position_update_interval
         position_update_interval = ENV['CONSUMER_POSITION_UPDATE_INTERVAL']
 

@@ -13,9 +13,9 @@ context "Subscription, Get Batch is Handled and Stream Reader Returns Empty Batc
     assert next_message == get_batch
   end
 
-  test "Actor thread is not delayed" do
-    refute subscription.kernel do
-      slept?
+  test "Actor thread is delayed briefly" do
+    assert subscription.kernel do
+      slept? Defaults.empty_queue_delay_seconds
     end
   end
 end
