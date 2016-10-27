@@ -52,10 +52,9 @@ module EventStore
           dispatch event_data
         end
 
-        next_starting_position = get_position batch.last
-        position_store.put next_starting_position
+        update_position batch
 
-        logger.info "Batch processed (#{log_attributes}, BatchSize: #{batch.size}, NextStartingPosition: #{next_starting_position})"
+        logger.info "Batch processed (#{log_attributes}, BatchSize: #{batch.size})"
 
         dequeue_batch
       end
@@ -75,6 +74,22 @@ module EventStore
 
           retry if _retry
         end
+      end
+
+      def update_position(batch)
+        next_starting_position = get_position batch.last
+
+        if update_position? next_starting_position
+          logger.trace "Updating starting position (#{log_attributes}, NextStartingPosition: #{next_starting_position}, PositionUpdateInterval: #{position_update_interval})"
+
+          position_store.put next_starting_position
+
+          logger.debug "Updating starting position (#{log_attributes}, NextStartingPosition: #{next_starting_position}, PositionUpdateInterval: #{position_update_interval})"
+        end
+      end
+
+      def update_position?(next_starting_position)
+        (next_starting_position + 1) % position_update_interval == 0
       end
 
       def get_position(event_data)
