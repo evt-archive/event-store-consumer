@@ -11,6 +11,7 @@ module EventStore
         extend CategoryMacro
         extend DispatcherMacro
         extend PositionStoreMacro
+        extend PositionUpdateIntervalMacro
         extend StreamMacro
         extend QueueSizeMacro
 
@@ -24,6 +25,8 @@ module EventStore
         attr_writer :stream_name
 
         initializer :queue
+
+        virtual :position_update_interval
       end
     end
 
@@ -55,8 +58,9 @@ module EventStore
           messaging_dispatcher,
           error_handler: error_handler,
           queue: queue,
-          include: :actor,
-          position_store: position_store
+          position_store: position_store,
+          position_update_interval: position_update_interval,
+          include: :actor
         )
 
         logger.info "Consumer started (StreamName: #{stream_name}, Dispatcher: #{messaging_dispatcher.class})"
@@ -135,6 +139,15 @@ module EventStore
       end
     end
 
+    module PositionUpdateIntervalMacro
+      def position_update_interval_macro(interval)
+        define_method :position_update_interval do
+          interval
+        end
+      end
+      alias_method :position_update_interval, :position_update_interval_macro
+    end
+
     module QueueSizeMacro
       def queue_size_macro(size)
         define_singleton_method :default_queue_size do
@@ -167,24 +180,6 @@ module EventStore
         end
       end
       alias_method :stream, :stream_macro
-    end
-
-    module Defaults
-      def self.batch_size
-        batch_size = ENV['CONSUMER_DEFAULT_BATCH_SIZE']
-
-        return batch_size.to_i if batch_size
-
-        100
-      end
-
-      def self.queue_size
-        queue_size = ENV['CONSUMER_DEFAULT_QUEUE_SIZE']
-
-        return queue_size.to_i if queue_size
-
-        1_000
-      end
     end
   end
 end

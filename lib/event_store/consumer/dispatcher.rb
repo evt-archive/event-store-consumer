@@ -5,6 +5,7 @@ module EventStore
       include Log::Dependency
 
       attr_writer :error_handler
+      attr_writer :position_update_interval
       attr_writer :queue
 
       dependency :messaging_dispatcher, EventStore::Messaging::Dispatcher
@@ -12,11 +13,12 @@ module EventStore
 
       initializer :stream_type
 
-      def self.build(stream_name, messaging_dispatcher, error_handler: nil, queue: nil, position_store: nil)
+      def self.build(stream_name, messaging_dispatcher, error_handler: nil, queue: nil, position_store: nil, position_update_interval: nil)
         stream_type = get_stream_type stream_name
 
         instance = new stream_type
 
+        instance.position_update_interval = position_update_interval
         instance.messaging_dispatcher = messaging_dispatcher
         instance.error_handler = error_handler if error_handler
         instance.position_store = position_store if position_store
@@ -89,6 +91,10 @@ module EventStore
 
       def queue
         @queue ||= Queue.new
+      end
+
+      def position_update_interval
+        @position_update_interval ||= Defaults.position_update_interval
       end
 
       def log_attributes
