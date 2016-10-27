@@ -77,7 +77,7 @@ module EventStore
       end
 
       def update_position(batch)
-        next_starting_position = get_position batch.last
+        next_starting_position = get_position(batch.last) + 1
 
         if update_position? next_starting_position
           logger.trace "Updating starting position (#{log_attributes}, NextStartingPosition: #{next_starting_position}, PositionUpdateInterval: #{position_update_interval})"
@@ -89,7 +89,7 @@ module EventStore
       end
 
       def update_position?(next_starting_position)
-        (next_starting_position + 1) % position_update_interval == 0
+        next_starting_position % position_update_interval == 0
       end
 
       def get_position(event_data)

@@ -6,6 +6,7 @@ module Fixtures
 
     stream get_stream_name
     dispatcher Controls::Messaging::Dispatcher::VerifySequence
+    position_update_interval 5
   end
 end
 
