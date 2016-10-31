@@ -1,7 +1,7 @@
 # -*- encoding: utf-8 -*-
 Gem::Specification.new do |s|
   s.name = 'event_store-consumer'
-  s.version = '1.0.0.0.pre5'
+  s.version = '0.3.0.0.pre1'
   s.summary = 'EventStore consumer (position tracking, retries, snapshots, etc.)'
 
   s.authors = ['The Eventide Project']
