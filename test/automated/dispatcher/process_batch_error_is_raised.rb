@@ -20,7 +20,7 @@ context "Dispatcher, Error is Raised While Handling ProcessBatch" do
     error = nil
 
     dispatcher = EventStore::Consumer::Dispatcher.new :stream
-    dispatcher.error_handler = proc { |_error| error = _error }
+    dispatcher.error_handler = lambda { |_error| error = _error }
 
     Controls::Subscription::Batch.enqueue dispatcher.queue
     Controls::Messaging::Dispatcher::Failure.configure dispatcher, attr_name: :messaging_dispatcher

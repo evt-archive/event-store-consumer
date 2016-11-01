@@ -73,7 +73,11 @@ module EventStore
           _retry = false
           retry_proc = proc { _retry = true }
 
-          error_handler.(error, retry_proc)
+          if error_handler.arity == 1
+            error_handler.(error)
+          else
+            error_handler.(error, retry_proc)
+          end
 
           retry if _retry
         end
