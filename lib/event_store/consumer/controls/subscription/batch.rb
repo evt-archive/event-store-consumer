@@ -11,9 +11,11 @@ module EventStore
             end
           end
 
-          def self.enqueue(queue, batch_size: nil)
+          def self.enqueue(dispatcher, batch_size: nil)
             batch = example batch_size
-            queue.enq batch
+
+            Actor::Messaging::Write.(batch, dispatcher.address)
+
             batch
           end
 

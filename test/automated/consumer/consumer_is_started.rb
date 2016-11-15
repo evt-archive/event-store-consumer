@@ -11,11 +11,7 @@ context "Consumer is Started" do
     assert subscription.session == consumer.session
   end
 
-  test "Queue is supplied to subscription" do
-    assert subscription.queue == consumer.queue
-  end
-
-  test "Queue is supplied to dispatcher" do
-    assert dispatcher.queue == consumer.queue
+  test "Subscription is supplied address of dispatcher" do
+    assert subscription.dispatcher_address == dispatcher.address
   end
 end

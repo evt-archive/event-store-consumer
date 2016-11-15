@@ -6,7 +6,7 @@ context "Dispatcher, Position is Updated" do
   context "Update interval is exceeded by position of last event in batch" do
     dispatcher = EventStore::Consumer::Dispatcher.new :stream
     dispatcher.position_update_interval = Controls::Subscription::Batch::Size.example
-    batch = Controls::Subscription::Batch.enqueue dispatcher.queue
+    batch = Controls::Subscription::Batch.enqueue dispatcher.address
 
     dispatcher.handle message
 

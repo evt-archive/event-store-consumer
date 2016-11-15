@@ -13,7 +13,6 @@ module EventStore
         extend PositionStoreMacro
         extend PositionUpdateIntervalMacro
         extend StreamMacro
-        extend QueueSizeMacro
 
         extend Build
         extend Start
@@ -23,8 +22,6 @@ module EventStore
         dependency :session, EventStore::Client::HTTP::Session
 
         attr_writer :stream_name
-
-        initializer :queue
 
         virtual :position_update_interval
       end
@@ -44,22 +41,21 @@ module EventStore
 
         error_handler = method(:handle_error).to_proc
 
-        _, subscription = Subscription.start(
-          stream_name,
-          batch_size: batch_size,
-          queue: queue,
-          session: session,
-          position_store: position_store,
-          include: :actor
-        )
-
-        _, dispatcher = Dispatcher.start(
+        dispatcher_address, dispatcher = Dispatcher.start(
           stream_name,
           messaging_dispatcher,
           error_handler: error_handler,
-          queue: queue,
           position_store: position_store,
           position_update_interval: position_update_interval,
+          include: :actor
+        )
+
+        _, subscription = Subscription.start(
+          stream_name,
+          dispatcher_address,
+          batch_size: batch_size,
+          session: session,
+          position_store: position_store,
           include: :actor
         )
 
@@ -92,9 +88,7 @@ module EventStore
 
     module Build
       def build(stream_name=nil, session: nil)
-        queue = SizedQueue.new default_queue_size
-
-        instance = new queue
+        instance = new
 
         instance.stream_name = stream_name if stream_name
 
@@ -146,19 +140,6 @@ module EventStore
         end
       end
       alias_method :position_update_interval, :position_update_interval_macro
-    end
-
-    module QueueSizeMacro
-      def queue_size_macro(size)
-        define_singleton_method :default_queue_size do
-          size
-        end
-      end
-      alias_method :queue_size, :queue_size_macro
-
-      def default_queue_size
-        Defaults.queue_size
-      end
     end
 
     module Start

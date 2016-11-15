@@ -5,8 +5,7 @@ module EventStore
       include Log::Dependency
 
       attr_writer :batch_size
-      attr_writer :kernel
-      attr_writer :queue
+      attr_writer :dispatcher_address
       attr_accessor :stream_reader
       attr_accessor :session
 
@@ -14,12 +13,11 @@ module EventStore
 
       initializer :stream_name
 
-      def self.build(stream_name, queue: nil, batch_size: nil, position_store: nil, session: nil)
+      def self.build(stream_name, dispatcher_address, batch_size: nil, position_store: nil, session: nil)
         instance = new stream_name
 
         instance.batch_size = batch_size if batch_size
-        instance.kernel = Kernel
-        instance.queue = queue
+        instance.dispatcher_address = dispatcher_address
         instance.session = session
         instance.position_store = position_store if position_store
 
@@ -74,11 +72,23 @@ module EventStore
       handle EnqueueBatch do |enqueue_batch|
         entries = enqueue_batch.entries
 
-        queue.enq entries
+        batch = Batch.build :entries => entries
+
+        write.(batch, dispatcher_address)
 
         get_batch = GetBatch.new
         get_batch.slice_uri = enqueue_batch.next_slice_uri
         get_batch
+      end
+
+      def starting_position
+        starting_position = position_store.get
+
+        if starting_position == :no_stream
+          nil
+        else
+          starting_position
+        end
       end
 
       def stream_reader
@@ -97,29 +107,15 @@ module EventStore
       def delay(seconds=nil)
         seconds ||= delay_seconds
 
-        kernel.sleep seconds
+        sleep seconds
       end
 
       def delay_seconds
         @delay_seconds ||= stream_reader.request.class::Defaults.long_poll_duration.to_f
       end
 
-      def kernel
-        @kernel ||= Actor::Substitutes::Kernel.new
-      end
-
-      def queue
-        @queue ||= Queue.new
-      end
-
-      def starting_position
-        starting_position = position_store.get
-
-        if starting_position == :no_stream
-          nil
-        else
-          starting_position
-        end
+      def dispatcher_address
+        @dispatcher_address ||= Actor::Messaging::Address::None
       end
 
       def log_attributes

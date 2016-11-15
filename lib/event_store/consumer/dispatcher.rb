@@ -5,26 +5,22 @@ module EventStore
       include Log::Dependency
 
       attr_writer :error_handler
-      attr_writer :kernel
       attr_writer :position_update_interval
-      attr_writer :queue
 
       dependency :messaging_dispatcher, EventStore::Messaging::Dispatcher
       dependency :position_store, PositionStore
 
       initializer :stream_type
 
-      def self.build(stream_name, messaging_dispatcher, error_handler: nil, queue: nil, position_store: nil, position_update_interval: nil)
+      def self.build(stream_name, messaging_dispatcher, error_handler: nil, position_store: nil, position_update_interval: nil)
         stream_type = get_stream_type stream_name
 
         instance = new stream_type
 
-        instance.kernel = Kernel
         instance.messaging_dispatcher = messaging_dispatcher
         instance.error_handler = error_handler if error_handler
         instance.position_store = position_store if position_store
         instance.position_update_interval = position_update_interval
-        instance.queue = queue if queue
 
         instance
       end
@@ -37,29 +33,19 @@ module EventStore
         end
       end
 
-      handle Actor::Messages::Start do
-        ProcessBatch.new
-      end
+      handle Batch do |batch|
+        entries = batch.entries
 
-      handle ProcessBatch do |dequeue_batch|
-        logger.trace "Dequeuing batch (#{log_attributes})"
+        log_attributes = "#{self.log_attributes}, EventCount: #{entries.count}"
+        logger.trace "Disptaching batch (#{log_attributes})"
 
-        if queue.empty?
-          logger.debug "Queue is empty; retrying (#{log_attributes})"
-          kernel.sleep Defaults.empty_queue_delay_seconds
-          return dequeue_batch
-        end
-        batch = queue.deq true
-
-        batch.each do |event_data|
+        entries.each do |event_data|
           dispatch event_data
         end
 
-        update_position batch
+        update_position entries
 
-        logger.info "Batch processed (#{log_attributes}, BatchSize: #{batch.size})"
-
-        dequeue_batch
+        logger.info "Batch processed (#{log_attributes})"
       end
 
       def dispatch(event_data)
@@ -109,14 +95,6 @@ module EventStore
 
       def error_handler
         @error_handler ||= proc { |error| raise error }
-      end
-
-      def kernel
-        @kernel ||= Actor::Substitutes::Kernel.new
-      end
-
-      def queue
-        @queue ||= Queue.new
       end
 
       def position_update_interval

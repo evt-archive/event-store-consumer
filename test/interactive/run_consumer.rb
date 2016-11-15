@@ -10,6 +10,6 @@ module Fixtures
   end
 end
 
-Actor::Supervisor.run do
+Actor::Supervisor.start do
   Fixtures::Consumer.start
 end

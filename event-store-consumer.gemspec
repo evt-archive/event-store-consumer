@@ -17,7 +17,7 @@ Gem::Specification.new do |s|
   s.add_runtime_dependency 'event_store-client-http'
   s.add_runtime_dependency 'event_store-messaging'
   s.add_runtime_dependency 'log'
-  s.add_runtime_dependency 'ntl-actor'
+  s.add_runtime_dependency 'ntl-actor', '>= 1.0.0.pre1'
   s.add_runtime_dependency 'serialize'
 
   s.add_development_dependency 'test_bench'
