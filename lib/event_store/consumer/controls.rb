@@ -2,6 +2,7 @@ require 'clock/controls'
 require 'identifier/uuid/controls'
 require 'event_store/client/http/controls'
 
+require 'event_store/consumer/controls/address'
 require 'event_store/consumer/controls/category'
 require 'event_store/consumer/controls/consumer_stream/consumer_updated'
 require 'event_store/consumer/controls/consumer_stream/write'

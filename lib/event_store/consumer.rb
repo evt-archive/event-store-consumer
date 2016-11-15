@@ -9,6 +9,7 @@ require 'event_store/messaging'
 
 require 'event_store/consumer/batch'
 require 'event_store/consumer/defaults'
+require 'event_store/consumer/kernel'
 require 'event_store/consumer/log'
 require 'event_store/consumer/messages'
 require 'event_store/consumer/position_store'

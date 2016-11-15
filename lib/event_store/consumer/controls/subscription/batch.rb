@@ -4,11 +4,9 @@ module EventStore
       module Subscription
         module Batch
           def self.example(size=nil)
-            size ||= Size.example
+            entries = Entries.example size
 
-            (0...size).map do |position|
-              EventData.example stream_position: position
-            end
+            EventStore::Consumer::Batch.build :entries => entries
           end
 
           def self.enqueue(dispatcher, batch_size: nil)
@@ -17,6 +15,16 @@ module EventStore
             Actor::Messaging::Write.(batch, dispatcher.address)
 
             batch
+          end
+
+          module Entries
+            def self.example(size=nil)
+              size ||= Size.example
+
+              entries = (0...size).map do |position|
+                EventData.example stream_position: position
+              end
+            end
           end
 
           module Size

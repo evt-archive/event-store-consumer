@@ -1,7 +1,7 @@
 require_relative '../automated_init'
 
 context "Subscription, Stream Reader is Configured" do
-  message = Actor::Messages::Start.new
+  message = Actor::Messages::Start
   stream_name = Controls::StreamName.example
 
   context do

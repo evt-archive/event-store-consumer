@@ -9,6 +9,7 @@ module EventStore
       attr_accessor :stream_reader
       attr_accessor :session
 
+      dependency :kernel, Kernel
       dependency :position_store, PositionStore
 
       initializer :stream_name
@@ -21,6 +22,7 @@ module EventStore
         instance.session = session
         instance.position_store = position_store if position_store
 
+        Kernel.configure instance
         EventStore::Client::HTTP::Session.configure instance, session: session
 
         instance
@@ -107,7 +109,7 @@ module EventStore
       def delay(seconds=nil)
         seconds ||= delay_seconds
 
-        sleep seconds
+        kernel.sleep seconds
       end
 
       def delay_seconds
