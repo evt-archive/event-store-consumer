@@ -46,6 +46,8 @@ module EventStore
         update_position entries
 
         logger.info "Batch processed (#{log_attributes})"
+
+        nil
       end
 
       def dispatch(event_data)

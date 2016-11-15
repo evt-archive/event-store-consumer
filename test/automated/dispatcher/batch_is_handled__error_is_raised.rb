@@ -1,12 +1,11 @@
 require_relative '../automated_init'
 
-context "Dispatcher, Error is Raised While Handling ProcessBatch" do
-  message = Controls::Dispatcher::ProcessBatch.example
+context "Dispatcher, Error is Raised While Handling Batch" do
+  message = Controls::Batch.example size: 1
 
   context "Error handler is not specified" do
     dispatcher = EventStore::Consumer::Dispatcher.new :stream
 
-    Controls::Subscription::Batch.enqueue dispatcher.queue
     Controls::Messaging::Dispatcher::Failure.configure dispatcher, attr_name: :messaging_dispatcher
 
     test "Error is not rescued" do
@@ -22,7 +21,6 @@ context "Dispatcher, Error is Raised While Handling ProcessBatch" do
     dispatcher = EventStore::Consumer::Dispatcher.new :stream
     dispatcher.error_handler = lambda { |_error| error = _error }
 
-    Controls::Subscription::Batch.enqueue dispatcher.queue
     Controls::Messaging::Dispatcher::Failure.configure dispatcher, attr_name: :messaging_dispatcher
 
     dispatcher.handle message
@@ -39,9 +37,10 @@ context "Dispatcher, Error is Raised While Handling ProcessBatch" do
     dispatcher.error_handler = proc { |_, retry_dispatch|
       retry_count += 1
       retry_dispatch.() unless retry_count == 3
+
+      fail if retry_count == 4
     }
 
-    Controls::Subscription::Batch.enqueue dispatcher.queue, batch_size: 1
     Controls::Messaging::Dispatcher::Failure.configure dispatcher, attr_name: :messaging_dispatcher
 
     dispatcher.handle message

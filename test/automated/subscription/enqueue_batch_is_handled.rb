@@ -12,7 +12,7 @@ context "Subscription, EnqueueBatch Message is Handled" do
   subscription.handle message
 
   test "Subscription writes batch to dispatcher" do
-    control_message = Controls::Subscription::Batch.example
+    control_message = Controls::Batch.example
 
     assert subscription.write do
       written? control_message, address: dispatcher_address
