@@ -24,7 +24,7 @@ module EventStore
               starting_position: starting_position + entry_count
             )
 
-            message = EventStore::Consumer::Subscription::EnqueueBatch.new
+            message = EventStore::Consumer::Messages::EnqueueBatch.new
             message.entries = entries
             message.next_slice_uri = next_slice_uri
             message
