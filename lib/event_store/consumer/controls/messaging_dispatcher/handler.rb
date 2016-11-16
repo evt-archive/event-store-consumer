@@ -1,7 +1,7 @@
 module EventStore
   module Consumer
     module Controls
-      module Messaging
+      module MessagingDispatcher
         module Handler
           class Example
             include ::Log::Dependency

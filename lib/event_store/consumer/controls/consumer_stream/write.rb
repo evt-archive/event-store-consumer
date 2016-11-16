@@ -8,7 +8,7 @@ module EventStore
 
             consumer_stream_name = EventStore::Consumer::StreamName.consumer_stream_name stream_name
 
-            message = ConsumerUpdated.example position: position
+            message = Messages::ConsumerUpdated.example position: position
 
             writer = EventStore::Messaging::Writer.build
             writer.write message, consumer_stream_name

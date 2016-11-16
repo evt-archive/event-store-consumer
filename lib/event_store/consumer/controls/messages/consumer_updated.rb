@@ -1,7 +1,7 @@
 module EventStore
   module Consumer
     module Controls
-      module ConsumerStream
+      module Messages
         module ConsumerUpdated
           def self.example(position: nil)
             position ||= Position.example

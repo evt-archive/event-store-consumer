@@ -15,5 +15,3 @@ require 'event_store/consumer/controls'
 require_relative './fixtures/fixtures_init'
 
 include EventStore::Consumer
-
-Consumer = EventStore::Consumer

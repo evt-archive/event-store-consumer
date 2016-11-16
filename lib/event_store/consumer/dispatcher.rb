@@ -25,25 +25,14 @@ module EventStore
         instance
       end
 
-      def self.get_stream_type(stream_name)
-        if StreamName.category? stream_name
-          :category
-        else
-          :stream
-        end
-      end
+      handle Messages::DispatchEvent do |dispatch_event|
+        event_data = dispatch_event.event_data
 
-      handle Batch do |batch|
-        entries = batch.entries
-
-        log_attributes = "#{self.log_attributes}, EventCount: #{entries.count}"
+        log_attributes = "#{self.log_attributes}, EventType: #{event_data.type.inspect}"
         logger.trace "Disptaching batch (#{log_attributes})"
 
-        entries.each do |event_data|
-          dispatch event_data
-        end
-
-        update_position entries
+        dispatch event_data
+        update_position event_data
 
         logger.info "Batch processed (#{log_attributes})"
 
@@ -71,8 +60,8 @@ module EventStore
         end
       end
 
-      def update_position(batch)
-        next_starting_position = get_position(batch.last) + 1
+      def update_position(event_data)
+        next_starting_position = get_position(event_data) + 1
 
         if update_position? next_starting_position
           logger.trace "Updating starting position (#{log_attributes}, NextStartingPosition: #{next_starting_position}, PositionUpdateInterval: #{position_update_interval})"
@@ -105,6 +94,14 @@ module EventStore
 
       def log_attributes
         "Dispatcher: #{messaging_dispatcher.class.name}"
+      end
+
+      def self.get_stream_type(stream_name)
+        if StreamName.category? stream_name
+          :category
+        else
+          :stream
+        end
       end
 
       module Assertions

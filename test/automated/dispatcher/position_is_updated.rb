@@ -1,26 +1,27 @@
 require_relative '../automated_init'
 
 context "Dispatcher, Position is Updated" do
-  message = Controls::Batch.example
+  next_starting_position = 100
+  event_data_position = next_starting_position - 1
 
-  context "Update interval is exceeded by position of last event in batch" do
+  message = Controls::Messages::DispatchEvent.example event_data_position
+
+  context "Next starting position is divisible by update interval" do
     dispatcher = EventStore::Consumer::Dispatcher.new :stream
-    dispatcher.position_update_interval = Controls::Batch::Size.example
+    dispatcher.position_update_interval = 10
 
     dispatcher.handle message
 
     test "Consumer position is updated" do
-      control_position = Controls::Batch::FinalPosition.example + 1
-
       assert dispatcher.position_store do
-        put? control_position
+        put? next_starting_position
       end
     end
   end
 
-  context "Update interval is not exceeded by position of last event in batch" do
+  context "Next starting position is not divisible by update interval" do
     dispatcher = EventStore::Consumer::Dispatcher.new :stream
-    dispatcher.position_update_interval = Controls::Batch::Size.example + 1
+    dispatcher.position_update_interval = 11
 
     dispatcher.handle message
 
