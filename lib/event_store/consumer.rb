@@ -24,6 +24,4 @@ require 'event_store/consumer/position_store/substitute'
 require 'event_store/consumer/dispatcher'
 require 'event_store/consumer/subscription'
 
-__END__
-
 require 'event_store/consumer/consumer'

@@ -6,7 +6,7 @@ context "Consumer Default Error Handler" do
   consumer_class = Class.new do
     include EventStore::Consumer
 
-    dispatcher Controls::Messaging::Dispatcher::Example
+    dispatcher Controls::MessagingDispatcher::Example
     stream :some_stream
   end
 

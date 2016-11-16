@@ -25,15 +25,8 @@ require 'event_store/consumer/controls/messages/consumer_updated'
 require 'event_store/consumer/controls/messaging_dispatcher/handler'
 require 'event_store/consumer/controls/messaging_dispatcher'
 require 'event_store/consumer/controls/consumer_stream/write'
+require 'event_store/consumer/controls/position_store'
 require 'event_store/consumer/controls/read'
 require 'event_store/consumer/controls/subscription/write'
-__END__
-
-require 'event_store/consumer/controls/dispatcher/process_batch'
-require 'event_store/consumer/controls/messaging/handler'
-require 'event_store/consumer/controls/position_store'
-require 'event_store/consumer/controls/subscription/enqueue_batch'
-require 'event_store/consumer/controls/subscription/get_batch'
-require 'event_store/consumer/controls/time'
 
 require 'event_store/consumer/controls/consumer'

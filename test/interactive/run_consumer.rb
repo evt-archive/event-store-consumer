@@ -5,7 +5,7 @@ module Fixtures
     include EventStore::Consumer
 
     stream get_stream_name
-    dispatcher Controls::Messaging::Dispatcher::VerifySequence
+    dispatcher Controls::MessagingDispatcher::VerifySequence
     position_update_interval 5
   end
 end

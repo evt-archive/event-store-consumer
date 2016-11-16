@@ -5,7 +5,7 @@ context "Consumer Batch Size Macro" do
     include Consumer
 
     batch_size 11
-    dispatcher Controls::Messaging::Dispatcher::Example
+    dispatcher Controls::MessagingDispatcher::Example
     stream :some_stream
   end
 

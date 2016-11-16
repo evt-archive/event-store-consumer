@@ -6,7 +6,7 @@ context "Consumer Stream Macro" do
       include Consumer
 
       stream :some_stream
-      dispatcher Controls::Messaging::Dispatcher::Example
+      dispatcher Controls::MessagingDispatcher::Example
     end
 
     consumer = consumer_class.build
@@ -25,7 +25,7 @@ context "Consumer Stream Macro" do
       include Consumer
 
       stream 'someStream-1'
-      dispatcher Controls::Messaging::Dispatcher::Example
+      dispatcher Controls::MessagingDispatcher::Example
     end
 
     consumer = consumer_class.build

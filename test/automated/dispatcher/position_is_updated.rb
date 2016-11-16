@@ -4,7 +4,7 @@ context "Dispatcher, Position is Updated" do
   next_starting_position = 100
   event_data_position = next_starting_position - 1
 
-  message = Controls::Messages::DispatchEvent.example event_data_position
+  message = Controls::Messages::DispatchEvent.example stream_position: event_data_position
 
   context "Next starting position is divisible by update interval" do
     dispatcher = EventStore::Consumer::Dispatcher.new :stream

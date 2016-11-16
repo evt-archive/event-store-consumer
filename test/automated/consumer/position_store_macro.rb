@@ -4,7 +4,7 @@ context "Consumer Position Store Macro" do
   consumer_class = Class.new do
     include Consumer
 
-    dispatcher Controls::Messaging::Dispatcher::Example
+    dispatcher Controls::MessagingDispatcher::Example
     stream :some_stream
     position_store Controls::PositionStore::Example
   end

@@ -7,7 +7,7 @@ Actor::Supervisor.run do
   subscription = Subscription.start stream_name, queue: queue
   dispatcher = Dispatcher.start(
     stream_name,
-    Controls::Messaging::Dispatcher::Failure,
+    Controls::MessagingDispatcher::Failure,
     queue: queue
   )
 end
