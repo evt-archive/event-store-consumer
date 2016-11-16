@@ -1,6 +1,6 @@
 module EventStore
   module Consumer
-    class Subscription
+    module Messages
       class GetBatch
         include Actor::Messaging::Message
         include Schema::DataStructure

@@ -1,7 +1,7 @@
 module EventStore
   module Consumer
     module Controls
-      module Subscription
+      module Messages
         module GetBatch
           def self.example(stream_name=nil, batch_index: nil)
             batch_index ||= 0
@@ -17,7 +17,7 @@ module EventStore
               )
             end
 
-            message = EventStore::Consumer::Subscription::GetBatch.new
+            message = EventStore::Consumer::Messages::GetBatch.new
             message.slice_uri = slice_uri
             message
           end

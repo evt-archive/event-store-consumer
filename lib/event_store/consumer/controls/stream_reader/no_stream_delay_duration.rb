@@ -2,9 +2,9 @@ module EventStore
   module Consumer
     module Controls
       module StreamReader
-        module LongPollDuration
+        module NoStreamDelayDuration
           def self.example
-            1
+            100
           end
         end
       end

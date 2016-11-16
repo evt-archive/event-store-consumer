@@ -1,7 +1,7 @@
 module EventStore
   module Consumer
     module Controls
-      module Subscription
+      module Messages
         module EnqueueBatch
           def self.example(stream_name=nil, entry_count: nil, starting_position: nil, starting_global_position: nil)
             entry_count ||= Batch::Size.example

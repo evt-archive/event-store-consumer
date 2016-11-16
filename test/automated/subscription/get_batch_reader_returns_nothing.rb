@@ -1,7 +1,7 @@
 require_relative '../automated_init'
 
 context "Subscription, Get Batch is Handled and Stream Reader Returns Nothing" do
-  get_batch = Controls::Subscription::GetBatch.example
+  get_batch = Controls::Messages::GetBatch.example
   stream_name = Controls::StreamName.example random: true
 
   subscription = EventStore::Consumer::Subscription.new stream_name
@@ -12,9 +12,9 @@ context "Subscription, Get Batch is Handled and Stream Reader Returns Nothing" d
     assert next_message == get_batch
   end
 
-  test "Actor thread is delayed by the long poll duration of the stream reader" do
+  test "Actor thread is delayed" do
     assert subscription.kernel do
-      slept? Controls::StreamReader::LongPollDuration.example
+      slept? Controls::StreamReader::NoStreamDelayDuration.example
     end
   end
 end

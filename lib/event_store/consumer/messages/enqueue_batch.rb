@@ -1,11 +1,11 @@
 module EventStore
   module Consumer
-    class Subscription
+    module Messages
       class EnqueueBatch
         include Actor::Messaging::Message
         include Schema::DataStructure
 
-        attribute :entries
+        attribute :entries, Array, default: ->{ Array.new }
         attribute :next_slice_uri, String
       end
     end
