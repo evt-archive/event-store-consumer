@@ -4,6 +4,7 @@ require 'event_store/client/http/controls'
 
 require 'event_store/consumer/controls/id'
 
+require 'event_store/consumer/controls/address'
 require 'event_store/consumer/controls/category'
 require 'event_store/consumer/controls/error'
 require 'event_store/consumer/controls/position'
@@ -28,7 +29,6 @@ require 'event_store/consumer/controls/read'
 require 'event_store/consumer/controls/subscription/write'
 __END__
 
-require 'event_store/consumer/controls/address'
 require 'event_store/consumer/controls/dispatcher/process_batch'
 require 'event_store/consumer/controls/messaging/handler'
 require 'event_store/consumer/controls/position_store'

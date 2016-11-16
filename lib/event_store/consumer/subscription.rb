@@ -73,11 +73,13 @@ module EventStore
       handle Messages::EnqueueBatch do |enqueue_batch|
         entries = enqueue_batch.entries
 
-        batch = Batch.build :entries => entries
+        entries.each do |event_data|
+          dispatch_event = Messages::DispatchEvent.build :event_data => event_data
 
-        write.(batch, dispatcher_address)
+          write.(dispatch_event, dispatcher_address)
+        end
 
-        get_batch = GetBatch.new
+        get_batch = Messages::GetBatch.new
         get_batch.slice_uri = enqueue_batch.next_slice_uri
         get_batch
       end
