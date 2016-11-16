@@ -20,22 +20,31 @@ period = ENV['PERIOD']
 period ||= 200
 period_seconds = Rational(period.to_i, 1000)
 
+batch_size = 25
+
 loop do
   stream_ids.each do |stream_id|
-    message = Controls::Message.example(
-      stream_position: stream_position,
-      global_position: global_position
-    )
-
-    global_position += 1
-
-    stream_name = EventStore::Client::StreamName.stream_name category, stream_id
     expected_version = stream_position - 1
 
-    writer.write message, stream_name, expected_version: expected_version
+    batch = (0...batch_size).map do |index|
+      pos = stream_position + index
+
+      message = Controls::Message.example(
+        stream_position: pos,
+        global_position: global_position
+      )
+
+      global_position += 1
+
+      message
+    end
+
+    stream_name = EventStore::Client::StreamName.stream_name category, stream_id
+
+    writer.write batch, stream_name, expected_version: expected_version
 
     sleep period_seconds
   end
 
-  stream_position += 1
+  stream_position += batch_size
 end
