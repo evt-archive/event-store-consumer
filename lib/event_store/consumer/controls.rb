@@ -27,6 +27,6 @@ require 'event_store/consumer/controls/messaging_dispatcher'
 require 'event_store/consumer/controls/consumer_stream/write'
 require 'event_store/consumer/controls/position_store'
 require 'event_store/consumer/controls/read'
-require 'event_store/consumer/controls/subscription/write'
+require 'event_store/consumer/controls/write'
 
 require 'event_store/consumer/controls/consumer'

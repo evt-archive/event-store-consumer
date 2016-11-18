@@ -1,7 +1,7 @@
 require_relative '../automated_init'
 
 context "Subscription, Get Batch is Handled and Stream Reader Returns Empty Batch" do
-  stream_name = Controls::Subscription::Write.()
+  stream_name = Controls::Write.()
 
   get_batch = Controls::Messages::GetBatch.example stream_name, batch_index: 1
 
