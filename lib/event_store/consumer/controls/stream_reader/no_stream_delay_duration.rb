@@ -3,8 +3,12 @@ module EventStore
     module Controls
       module StreamReader
         module NoStreamDelayDuration
-          def self.example
+          def self.milliseconds
             100
+          end
+
+          def self.seconds
+            Rational(milliseconds, 1000)
           end
         end
       end

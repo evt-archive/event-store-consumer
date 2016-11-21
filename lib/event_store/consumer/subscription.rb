@@ -95,7 +95,7 @@ module EventStore
       end
 
       def delay
-        duration = Defaults.no_stream_delay_duration
+        duration = Defaults.no_stream_delay_duration_seconds
 
         kernel.sleep duration
       end

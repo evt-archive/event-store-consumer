@@ -9,7 +9,13 @@ module EventStore
         100
       end
 
-      def self.no_stream_delay_duration
+      def self.no_stream_delay_duration_seconds
+        ms = no_stream_delay_duration_milliseconds
+
+        Rational(ms, 1000)
+      end
+
+      def self.no_stream_delay_duration_milliseconds
         no_stream_delay_duration = ENV['CONSUMER_NO_STREAM_DELAY_DURATION']
 
         return no_stream_delay_duration.to_i if no_stream_delay_duration

@@ -14,7 +14,7 @@ context "Subscription, Get Batch is Handled and Stream Reader Returns Nothing" d
 
   test "Actor thread is delayed" do
     assert subscription.kernel do
-      slept? Controls::StreamReader::NoStreamDelayDuration.example
+      slept? Controls::StreamReader::NoStreamDelayDuration.seconds
     end
   end
 end
