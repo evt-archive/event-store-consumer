@@ -23,6 +23,7 @@ module EventStore
 
         attr_writer :stream_name
 
+        virtual :configure
         virtual :position_update_interval
       end
     end
@@ -95,6 +96,8 @@ module EventStore
         position_store_class.configure instance, instance.stream_name
         messaging_dispatcher_class.configure instance, attr_name: :messaging_dispatcher
         EventStore::Client::HTTP::Session.configure instance, session: session
+
+        instance.configure
 
         instance
       end

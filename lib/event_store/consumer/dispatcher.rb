@@ -12,6 +12,8 @@ module EventStore
 
       initializer :stream_type
 
+      virtual :configure
+
       def self.build(stream_name, messaging_dispatcher, error_handler: nil, position_store: nil, position_update_interval: nil)
         stream_type = get_stream_type stream_name
 
@@ -21,6 +23,8 @@ module EventStore
         instance.error_handler = error_handler if error_handler
         instance.position_store = position_store if position_store
         instance.position_update_interval = position_update_interval
+
+        instance.configure
 
         instance
       end
