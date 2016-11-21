@@ -12,6 +12,10 @@ context "Subscription, Stream Reader is Configured" do
     test "Start path is configured" do
       assert stream_reader.start_path == Controls::StreamReader::StartPath.example
     end
+
+    test "Long polling is enabled" do
+      assert stream_reader.request.long_poll
+    end
   end
 
   context "Session is supplied to subscription" do

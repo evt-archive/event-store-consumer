@@ -106,7 +106,9 @@ module EventStore
           session: session,
           slice_size: batch_size,
           starting_position: starting_position
-        )
+        ).tap do |stream_reader|
+          stream_reader.request.enable_long_poll
+        end
       end
 
       def batch_size
