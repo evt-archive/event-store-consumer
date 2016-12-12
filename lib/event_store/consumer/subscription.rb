@@ -76,7 +76,7 @@ module EventStore
         entries.each do |event_data|
           dispatch_event = Messages::DispatchEvent.build :event_data => event_data
 
-          write.(dispatch_event, dispatcher_address)
+          send.(dispatch_event, dispatcher_address)
         end
 
         get_batch = Messages::GetBatch.new

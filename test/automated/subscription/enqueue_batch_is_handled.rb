@@ -14,8 +14,8 @@ context "Subscription, EnqueueBatch Message is Handled" do
   test "Subscription sends itself next GetBatch message" do
     control_message = Controls::Messages::GetBatch.example batch_index: 1
 
-    assert subscription.write do
-      written? control_message, address: subscription.address
+    assert subscription.send do
+      sent? control_message, address: subscription.address
     end
   end
 
@@ -24,8 +24,8 @@ context "Subscription, EnqueueBatch Message is Handled" do
       test "Event ##{index}" do
         control_message = Controls::Messages::DispatchEvent.example event_data
 
-        assert subscription.write do
-          written? control_message, address: dispatcher_address
+        assert subscription.send do
+          sent? control_message, address: dispatcher_address
         end
       end
     end

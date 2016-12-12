@@ -9,9 +9,9 @@ context "Subscription, Get Batch is Handled and Stream Reader Returns Batch" do
 
   next_message = subscription.handle get_batch
 
-  test "EnqueueBatch is written to actor" do
-    assert subscription.write do
-      written? next_message
+  test "EnqueueBatch is sent to actor" do
+    assert subscription.send do
+      sent? next_message
     end
   end
 
