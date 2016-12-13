@@ -8,8 +8,20 @@ module Fixtures
     dispatcher Controls::MessagingDispatcher::VerifySequence
     position_update_interval 5
   end
+
+  class Process
+    include ProcessHost::Process
+
+    def start
+      Consumer.start
+    end
+  end
 end
 
-Actor::Supervisor.start do
-  Fixtures::Consumer.start
+ProcessHost.start 'interactive-consumer' do
+  record_error do |error|
+    puts "Error: #{error}"
+  end
+
+  register Fixtures::Process
 end

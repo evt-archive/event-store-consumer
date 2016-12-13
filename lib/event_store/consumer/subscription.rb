@@ -119,6 +119,10 @@ module EventStore
         @dispatcher_address ||= Actor::Messaging::Address::None
       end
 
+      def digest
+        "#{self.class}[streamName=#{stream_name}]"
+      end
+
       def log_attributes
         "StreamName: #{stream_name}, BatchSize: #{batch_size}"
       end

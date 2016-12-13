@@ -2,6 +2,8 @@ ENV['CATEGORY'] ||= 'on'
 
 require_relative '../test_init'
 
+require 'process_host'
+
 def get_stream_name(file: nil)
   file ||= "tmp/stream_name"
 

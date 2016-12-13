@@ -96,6 +96,10 @@ module EventStore
         @position_update_interval ||= Defaults.position_update_interval
       end
 
+      def digest
+        "#{self.class}[dispatcher=#{messaging_dispatcher.class}, streamType=#{stream_type}]"
+      end
+
       def log_attributes
         "Dispatcher: #{messaging_dispatcher.class.name}"
       end
