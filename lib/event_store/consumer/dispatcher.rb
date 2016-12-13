@@ -33,12 +33,12 @@ module EventStore
         event_data = dispatch_event.event_data
 
         log_attributes = "#{self.log_attributes}, EventType: #{event_data.type.inspect}"
-        logger.trace "Disptaching batch (#{log_attributes})"
+        logger.trace "Dispatching event (#{log_attributes})"
 
         dispatch event_data
         update_position event_data
 
-        logger.info "Batch processed (#{log_attributes})"
+        logger.info "Event dispatched (#{log_attributes})"
 
         nil
       end
