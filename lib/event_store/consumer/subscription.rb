@@ -73,6 +73,10 @@ module EventStore
       handle Messages::EnqueueBatch do |enqueue_batch|
         entries = enqueue_batch.entries
 
+        log_attributes = "#{self.log_attributes}, EntryCount: #{entries.count})"
+
+        logger.trace "Enqueuing batch (#{log_attributes})"
+
         entries.each do |event_data|
           dispatch_event = Messages::DispatchEvent.build :event_data => event_data
 
@@ -81,6 +85,9 @@ module EventStore
 
         get_batch = Messages::GetBatch.new
         get_batch.slice_uri = enqueue_batch.next_slice_uri
+
+        logger.debug "Enqueue batch done (#{log_attributes})"
+
         get_batch
       end
 
