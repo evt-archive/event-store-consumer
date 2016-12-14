@@ -5,7 +5,7 @@ module EventStore
       include Log::Dependency
 
       attr_writer :batch_size
-      attr_writer :dispatcher_address
+      attr_writer :dispatcher_queue_depth_limit
       attr_accessor :stream_reader
       attr_accessor :session
 
@@ -45,7 +45,7 @@ module EventStore
         log_attributes = "#{self.log_attributes}, SliceURI: #{get_batch.slice_uri.inspect})"
 
         verify_dispatcher_queue_depth do |depth, limit|
-          logger.warn "Dispatcher queue depth exceeds limit; pausing (#{log_attributes}, Depth: #{depth}, Limit: #{limit})"
+          logger.debug "Dispatcher queue depth exceeds limit; pausing (#{log_attributes}, Depth: #{depth}, Limit: #{limit})"
           delay
           return get_batch
         end
