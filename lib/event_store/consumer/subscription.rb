@@ -5,10 +5,11 @@ module EventStore
       include Log::Dependency
 
       attr_writer :batch_size
-      attr_writer :dispatcher_address
+      attr_writer :dispatcher_queue_depth_limit
       attr_accessor :stream_reader
       attr_accessor :session
 
+      dependency :dispatcher_address, Actor::Messaging::Address
       dependency :kernel, Kernel
       dependency :position_store, PositionStore
 
@@ -42,6 +43,12 @@ module EventStore
 
       handle Messages::GetBatch do |get_batch|
         log_attributes = "#{self.log_attributes}, SliceURI: #{get_batch.slice_uri.inspect})"
+
+        verify_dispatcher_queue_depth do |depth, limit|
+          logger.debug "Dispatcher queue depth exceeds limit; pausing (#{log_attributes}, Depth: #{depth}, Limit: #{limit})"
+          delay
+          return get_batch
+        end
 
         logger.trace "Getting batch (#{log_attributes})"
 
@@ -91,6 +98,21 @@ module EventStore
         get_batch
       end
 
+      def verify_dispatcher_queue_depth(&block)
+        logger.trace "Verifying dispatcher queue depth (#{log_attributes})"
+
+        depth = dispatcher_address.queue_depth
+
+        limit = dispatcher_queue_depth_limit
+
+        if depth > limit
+          logger.debug "Dispatcher queue depth exceeds limit (#{log_attributes}, Depth: #{depth}, Limit: #{limit})"
+          block.(depth, limit)
+        else
+          logger.debug "Dispatcher queue depth within limit (#{log_attributes}, Depth: #{depth}, Limit: #{limit})"
+        end
+      end
+
       def starting_position
         starting_position = position_store.get
 
@@ -122,8 +144,8 @@ module EventStore
         @batch_size ||= Defaults.batch_size
       end
 
-      def dispatcher_address
-        @dispatcher_address ||= Actor::Messaging::Address::None
+      def dispatcher_queue_depth_limit
+        @dispatcher_queue_depth_limit ||= Defaults.dispatcher_queue_depth_limit
       end
 
       def digest

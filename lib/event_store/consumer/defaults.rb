@@ -9,6 +9,14 @@ module EventStore
         100
       end
 
+      def self.dispatcher_queue_depth_limit
+        queue_depth_limit = ENV['CONSUMER_DISPATCHER_QUEUE_DEPTH_LIMIT']
+
+        return queue_depth_limit.to_i if queue_depth_limit
+
+        Rational(batch_size, 3).to_i
+      end
+
       def self.no_stream_delay_duration_seconds
         ms = no_stream_delay_duration_milliseconds
 
