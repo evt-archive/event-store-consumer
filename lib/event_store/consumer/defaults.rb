@@ -2,11 +2,11 @@ module EventStore
   module Consumer
     module Defaults
       def self.batch_size
-        batch_size = ENV['CONSUMER_DEFAULT_BATCH_SIZE']
+        batch_size = ENV['CONSUMER_BATCH_SIZE']
 
         return batch_size.to_i if batch_size
 
-        100
+        20
       end
 
       def self.dispatcher_queue_depth_limit
