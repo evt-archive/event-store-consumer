@@ -1,4 +1,3 @@
-require 'clock/controls'
 require 'event_store/client/http/controls'
 
 require 'event_store/consumer/controls/id'
