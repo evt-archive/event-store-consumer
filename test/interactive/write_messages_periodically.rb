@@ -39,7 +39,7 @@ loop do
       message
     end
 
-    stream_name = EventStore::Client::StreamName.stream_name category, stream_id
+    stream_name = EventStore::Messaging::StreamName.stream_name stream_id, category
 
     writer.write batch, stream_name, expected_version: expected_version
 
