@@ -108,7 +108,7 @@ module EventStore
         category = Casing::Camel.(category, symbol_to_string: true)
 
         define_singleton_method :stream_name do
-          EventStore::Client::StreamName.category_stream_name category
+          EventStore::Messaging::StreamName.category_stream_name category
         end
       end
       alias_method :category, :category_macro

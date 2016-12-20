@@ -1,7 +1,7 @@
 module EventStore
   module Consumer
     module Controls
-      ID = Identifier::UUID::Controls::Incrementing
+      ID = EventStore::Client::HTTP::Controls::ID
     end
   end
 end

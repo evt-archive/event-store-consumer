@@ -1,8 +1,4 @@
 require 'actor'
-require 'configure'; Configure.activate
-require 'initializer' ; Initializer.activate
-require 'log'
-require 'virtual'; Virtual.activate
 
 require 'event_store/client/http'
 require 'event_store/messaging'

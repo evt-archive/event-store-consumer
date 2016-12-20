@@ -1,5 +1,4 @@
 require 'clock/controls'
-require 'identifier/uuid/controls'
 require 'event_store/client/http/controls'
 
 require 'event_store/consumer/controls/id'
