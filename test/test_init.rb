@@ -4,6 +4,8 @@ ENV['CONSOLE_DEVICE'] ||= 'stdout'
 ENV['LOG_COLOR'] ||= 'on'
 ENV['LOG_LEVEL'] ||= 'trace'
 
+ENV['DISABLE_EVENT_STORE_LEADER_DETECTION'] ||= 'on'
+
 puts RUBY_DESCRIPTION
 
 require 'pp'

@@ -14,7 +14,7 @@ context "Subscription, Stream Reader is Configured" do
     end
 
     test "Long polling is enabled" do
-      assert stream_reader.request.long_poll
+      assert stream_reader.request.long_poll_enabled?
     end
   end
 

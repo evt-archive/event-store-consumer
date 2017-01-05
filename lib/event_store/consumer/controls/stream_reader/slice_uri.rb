@@ -15,11 +15,15 @@ module EventStore
             else
               settings = EventStore::Client::HTTP::Settings.instance
 
-              host, port = settings.get(:host), settings.get(:port)
+              port = settings.get(:port)
 
-              "http://#{host}:#{port}#{path}"
+              ip_address = IPAddress.example
+
+              "http://#{ip_address}:#{port}#{path}"
             end
           end
+
+          IPAddress = EventSource::EventStore::HTTP::Controls::IPAddress
         end
       end
     end
