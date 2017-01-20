@@ -13,7 +13,7 @@ module EventStore
         end
 
         class ExampleMessage
-          include EventStore::Messaging::Message
+          include ::Messaging::Message
 
           attribute :stream_position, Integer
           attribute :global_position, Integer
