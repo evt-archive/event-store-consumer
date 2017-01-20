@@ -5,8 +5,13 @@ module EventStore
         include Actor::Messaging::Message
         include Schema::DataStructure
 
-        attribute :entries, Array, default: ->{ Array.new }
-        attribute :next_slice_uri, String
+        attribute :batch, Array, default: ->{ Array.new }
+
+        def each(&block)
+          return to_enum :each unless block_given?
+
+          batch.each &block
+        end
       end
     end
   end

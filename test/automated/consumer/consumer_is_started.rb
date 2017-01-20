@@ -8,7 +8,9 @@ context "Consumer is Started" do
   subscription, dispatcher = consumer.start
 
   test "Session is supplied to subscription" do
-    assert subscription.session == consumer.session
+    assert subscription do
+      session? consumer.session
+    end
   end
 
   test "Subscription is supplied address of dispatcher" do

@@ -2,14 +2,13 @@ module EventStore
   module Consumer
     module Controls
       module Read
-        def self.call(stream_name, direction=nil, &action)
-          reader = EventStore::Client::HTTP::Reader.build(
+        def self.call(stream_name, precedence=nil, &action)
+          EventSource::EventStore::HTTP::Read.(
             stream_name,
-            direction: direction,
-            slice_size: 1
+            precedence: precedence,
+            batch_size: 1,
+            &action
           )
-
-          reader.each &action
         end
       end
     end

@@ -7,7 +7,7 @@ module EventStore
       attr_writer :error_handler
       attr_writer :position_update_interval
 
-      dependency :messaging_dispatcher, EventStore::Messaging::Dispatcher
+      dependency :messaging_dispatcher, ::EventStore::Messaging::Dispatcher
       dependency :position_store, PositionStore
 
       initializer :stream_type
@@ -82,9 +82,9 @@ module EventStore
 
       def get_position(event_data)
         if stream_type == :category
-          event_data.position
+          event_data.global_position
         else
-          event_data.number
+          event_data.position
         end
       end
 

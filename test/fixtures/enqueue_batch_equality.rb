@@ -14,18 +14,18 @@ module Fixtures
         AttributeEquality.(
           compare,
           control,
-          exclude: :entries,
+          exclude: :batch,
           description: "Message attributes match"
         )
 
         context "Event Data entries match" do
-          control.entries.each_with_index do |control_entry, index|
-            compare_entry = compare.entries[index]
+          control.batch.each_with_index do |control_entry, index|
+            compare_entry = compare.batch[index]
 
             AttributeEquality.(
               compare_entry,
               control_entry,
-              exclude: :created_time,
+              exclude: [:time, :id],
               description: "Entry ##{index + 1}"
             )
           end

@@ -19,7 +19,7 @@ module EventStore
 
         dependency :messaging_dispatcher, EventStore::Messaging::Dispatcher
         dependency :position_store, PositionStore
-        dependency :session, EventStore::Client::HTTP::Session
+        dependency :session, EventSource::EventStore::HTTP::Session
 
         attr_writer :stream_name
 
@@ -95,7 +95,7 @@ module EventStore
 
         position_store_class.configure instance, instance.stream_name
         messaging_dispatcher_class.configure instance, attr_name: :messaging_dispatcher
-        EventStore::Client::HTTP::Session.configure instance, session: session
+        EventSource::EventStore::HTTP::Session.configure instance, session: session
 
         instance.configure
 
@@ -108,7 +108,7 @@ module EventStore
         category = Casing::Camel.(category, symbol_to_string: true)
 
         define_singleton_method :stream_name do
-          EventStore::Messaging::StreamName.category_stream_name category
+          EventSource::EventStore::HTTP::StreamName.category_stream_name category
         end
       end
       alias_method :category, :category_macro

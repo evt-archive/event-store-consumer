@@ -12,7 +12,7 @@ context "Consumer Stream Position Store, Put Operation" do
 
     position = nil
 
-    Controls::Read.(consumer_stream_name, :backward) do |event_data|
+    Controls::Read.(consumer_stream_name, :desc) do |event_data|
       position = event_data.data[:position]
       break
     end
