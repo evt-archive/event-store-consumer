@@ -6,9 +6,9 @@ module EventStore
 
         initializer :stream_name
 
-        dependency :reader, EventStore::Client::HTTP::Reader
-        dependency :session, EventStore::Client::HTTP::Session
-        dependency :writer, EventStore::Messaging::Writer
+        dependency :read, EventSource::EventStore::HTTP::Read
+        dependency :session, EventSource::EventStore::HTTP::Session
+        dependency :write, ::Messaging::EventStore::Write
 
         def self.build(stream_name, session: nil)
           consumer_stream_name = StreamName.consumer_stream_name stream_name
@@ -29,25 +29,22 @@ module EventStore
         end
 
         def configure(session: nil)
-          session = EventStore::Client::HTTP::Session.configure self, session: session
+          session = EventSource::EventStore::HTTP::Session.configure self, session: session
 
-          EventStore::Client::HTTP::Reader.configure(
+          EventSource::EventStore::HTTP::Read.configure(
             self,
             stream_name,
-            direction: :backward,
-            slice_size: 1,
+            precedence: :desc,
+            batch_size: 1,
             session: session
           )
 
-          EventStore::Messaging::Writer.configure self, session: session
+          ::Messaging::EventStore::Write.configure self, session: session
         end
 
         def get
-          reader.each do |event_data|
-            consumer_updated = EventStore::Messaging::Message::Import::EventData.(
-              event_data,
-              Messages::ConsumerUpdated
-            )
+          read.() do |event_data|
+            consumer_updated = ::Messaging::Message::Import.(event_data, Messages::ConsumerUpdated)
 
             return consumer_updated.position
           end
@@ -59,7 +56,7 @@ module EventStore
           message = Messages::ConsumerUpdated.build
           message.position = position
 
-          writer.write message, stream_name
+          write.(message, stream_name)
 
           message
         end

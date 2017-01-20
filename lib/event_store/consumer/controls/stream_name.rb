@@ -7,7 +7,7 @@ module EventStore
 
           stream_id = ID.example
 
-          EventStore::Messaging::StreamName.stream_name stream_id, category
+          ::Messaging::StreamName.stream_name stream_id, category
         end
 
         module Consumer
@@ -38,7 +38,7 @@ module EventStore
           def self.example(random: nil)
             category = Controls::Category.example random: random
 
-            EventStore::Messaging::StreamName.category_stream_name category
+            EventSource::EventStore::HTTP::StreamName.category_stream_name category
           end
 
           module Consumer

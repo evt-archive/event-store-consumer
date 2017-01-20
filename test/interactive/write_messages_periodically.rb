@@ -14,7 +14,7 @@ else
   category, *stream_ids = StreamName.split stream_name
 end
 
-writer = EventStore::Messaging::Writer.build
+write = Messaging::EventStore::Write.build
 
 period = ENV['PERIOD']
 period ||= 200
@@ -39,9 +39,9 @@ loop do
       message
     end
 
-    stream_name = EventStore::Messaging::StreamName.stream_name stream_id, category
+    stream_name = ::Messaging::StreamName.stream_name stream_id, category
 
-    writer.write batch, stream_name, expected_version: expected_version
+    write.(batch, stream_name, expected_version: expected_version)
 
     sleep period_seconds
   end

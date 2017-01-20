@@ -2,7 +2,7 @@ module EventStore
   module Consumer
     module Messages
       class ConsumerUpdated
-        include EventStore::Messaging::Message
+        include ::Messaging::Message
 
         attribute :position, Integer
       end

@@ -1,7 +1,7 @@
 module EventStore
   module Consumer
     module Controls
-      ID = EventStore::Client::HTTP::Controls::ID
+      ID = ::Messaging::Controls::ID
     end
   end
 end

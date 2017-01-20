@@ -13,7 +13,7 @@ context "Consumer Batch Size Macro" do
 
   subscription, _ = consumer.start
 
-  test "Batch size is supplied to subscription" do
-    assert subscription.batch_size == 11
+  test "Batch size is supplied to get" do
+    assert subscription.get.batch_size == 11
   end
 end

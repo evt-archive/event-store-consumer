@@ -1,6 +1,5 @@
 require 'actor'
 
-require 'event_store/client/http'
 require 'event_store/messaging'
 
 require 'event_store/consumer/log'

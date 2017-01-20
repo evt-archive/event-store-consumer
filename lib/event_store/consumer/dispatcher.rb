@@ -7,7 +7,7 @@ module EventStore
       attr_writer :error_handler
       attr_writer :position_update_interval
 
-      dependency :messaging_dispatcher, EventStore::Messaging::Dispatcher
+      dependency :messaging_dispatcher, ::EventStore::Messaging::Dispatcher
       dependency :position_store, PositionStore
 
       initializer :stream_type

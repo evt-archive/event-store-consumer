@@ -6,10 +6,20 @@ module EventStore
 
       attr_writer :batch_size
       attr_writer :dispatcher_queue_depth_limit
-      attr_accessor :stream_reader
+      attr_writer :iterator
       attr_accessor :session
 
+      def iterator
+        @iterator ||= EventSource::Iterator.configure(
+          self,
+          get,
+          stream_name,
+          position: starting_position
+        )
+      end
+
       dependency :dispatcher_address, Actor::Messaging::Address
+      dependency :get, EventSource::EventStore::HTTP::Get
       dependency :kernel, Kernel
       dependency :position_store, PositionStore
 
@@ -18,31 +28,34 @@ module EventStore
       def self.build(stream_name, dispatcher_address, batch_size: nil, position_store: nil, session: nil)
         instance = new stream_name
 
-        instance.batch_size = batch_size if batch_size
+        cycle = Cycle.build(
+          maximum_milliseconds: Defaults.cycle_maximum_milliseconds,
+          timeout_milliseconds: Defaults.cycle_maximum_milliseconds
+        )
+
+        long_poll_duration = Rational(cycle.maximum_milliseconds, 1000).ceil
+
+        EventSource::EventStore::HTTP::Get.configure(
+          instance,
+          batch_size: batch_size,
+          long_poll_duration: long_poll_duration,
+          session: session
+        )
+
         instance.dispatcher_address = dispatcher_address
-        instance.session = session
         instance.position_store = position_store if position_store
 
         Kernel.configure instance
-        EventStore::Client::HTTP::Session.configure instance, session: session
 
         instance
       end
 
       handle Actor::Messages::Start do
-        start_path = stream_reader.start_path
-
-        logger.trace "Configuring initial batch (#{log_attributes}, StartPath: #{start_path})"
-
-        get_batch = Messages::GetBatch.build :slice_uri => start_path
-
-        logger.debug "Initial batch configured (#{log_attributes}, StartPath: #{start_path})"
-
-        get_batch
+        :get_batch
       end
 
       handle Messages::GetBatch do |get_batch|
-        log_attributes = "#{self.log_attributes}, SliceURI: #{get_batch.slice_uri.inspect})"
+        log_attributes = "#{self.log_attributes}"
 
         verify_dispatcher_queue_depth do |depth, limit|
           logger.debug "Dispatcher queue depth exceeds limit; pausing (#{log_attributes}, Depth: #{depth}, Limit: #{limit})"
@@ -52,50 +65,38 @@ module EventStore
 
         logger.trace "Getting batch (#{log_attributes})"
 
-        slice = stream_reader.next_slice get_batch.slice_uri
+        batch = iterator.next
 
-        if slice.nil?
+        if batch.nil?
           logger.debug "Get batch returned nothing; retrying (#{log_attributes})"
           delay
           return get_batch
         end
 
-        entries = slice.entries
-
-        if entries.empty?
+        if batch.empty?
           logger.debug "Get batch returned empty set; retrying (#{log_attributes})"
           return get_batch
         end
 
-        next_slice_uri = slice.next_uri :forward
+        logger.debug "Get batch done (#{log_attributes}, EntryCount: #{entries.count})"
 
-        logger.debug "Get batch done (#{log_attributes}, EntryCount: #{entries.count}, NextSliceUri: #{next_slice_uri})"
-
-        Messages::EnqueueBatch.build(
-          :next_slice_uri => next_slice_uri,
-          :entries => slice.entries.reverse
-        )
+        Messages::EnqueueBatch.build :batch => batch.reverse
       end
 
       handle Messages::EnqueueBatch do |enqueue_batch|
-        entries = enqueue_batch.entries
-
         log_attributes = "#{self.log_attributes}, EntryCount: #{entries.count})"
 
         logger.trace "Enqueuing batch (#{log_attributes})"
 
-        entries.each do |event_data|
+        enqueue_batch.each do |event_data|
           dispatch_event = Messages::DispatchEvent.build :event_data => event_data
 
           send.(dispatch_event, dispatcher_address)
         end
 
-        get_batch = Messages::GetBatch.new
-        get_batch.slice_uri = enqueue_batch.next_slice_uri
-
         logger.debug "Enqueue batch done (#{log_attributes})"
 
-        get_batch
+        :get_batch
       end
 
       def verify_dispatcher_queue_depth(&block)
@@ -129,19 +130,8 @@ module EventStore
         kernel.sleep duration
       end
 
-      def stream_reader
-        @stream_reader ||= EventStore::Client::HTTP::StreamReader::Continuous.build(
-          stream_name,
-          session: session,
-          slice_size: batch_size,
-          starting_position: starting_position
-        ).tap do |stream_reader|
-          stream_reader.request.enable_long_poll
-        end
-      end
-
-      def batch_size
-        @batch_size ||= Defaults.batch_size
+      def cycle_maximum_milliseconds
+        @cycle_maximum_milliseconds ||= Defaults.cycle_maximum_milliseconds
       end
 
       def dispatcher_queue_depth_limit
@@ -153,7 +143,7 @@ module EventStore
       end
 
       def log_attributes
-        "StreamName: #{stream_name}, BatchSize: #{batch_size}"
+        "StreamName: #{iterator.stream_name}, BatchSize: #{get.batch_size}"
       end
     end
   end

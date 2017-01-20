@@ -31,6 +31,14 @@ module EventStore
         100
       end
 
+      def self.cycle_maximum_milliseconds
+        long_poll_duration = ENV['LONG_POLL_DURATION']
+
+        return (long_poll_duration * 1000).to_i if long_poll_duration
+
+        1_000
+      end
+
       def self.position_update_interval
         position_update_interval = ENV['CONSUMER_POSITION_UPDATE_INTERVAL']
 

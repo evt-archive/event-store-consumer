@@ -10,8 +10,8 @@ module EventStore
 
             message = Messages::ConsumerUpdated.example position: position
 
-            writer = EventStore::Messaging::Writer.build
-            writer.write message, consumer_stream_name
+            write = ::Messaging::EventStore::Write.build
+            write.(message, consumer_stream_name)
 
             stream_name
           end

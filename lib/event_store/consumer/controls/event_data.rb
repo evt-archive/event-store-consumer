@@ -10,13 +10,11 @@ module EventStore
           type = Type.example
           data = Data.example stream_position: stream_position
 
-          EventStore::Client::HTTP::Controls::EventData::Read.example(
-            stream_position,
-            data: data,
-            position: global_position,
-            stream_name: stream_name,
-            type: type
-          )
+          event_data = EventSource::Controls::EventData::Read.example data: data, type: type
+          event_data.position = stream_position
+          event_data.global_position = global_position
+          event_data.stream_name = stream_name
+          event_data
         end
 
         module Data
@@ -37,8 +35,7 @@ module EventStore
           def self.example(position: nil)
             read_event_data = EventData.example stream_position: position
 
-            write_event_data = EventStore::Client::HTTP::EventData::Write.build
-            write_event_data.assign_id
+            write_event_data = EventSource::EventData::Write.build
 
             SetAttributes.(write_event_data, read_event_data)
 
