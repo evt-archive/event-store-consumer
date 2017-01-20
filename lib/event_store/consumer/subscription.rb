@@ -7,7 +7,6 @@ module EventStore
       attr_writer :batch_size
       attr_writer :dispatcher_queue_depth_limit
       attr_writer :iterator
-      attr_accessor :session
 
       def iterator
         @iterator ||= EventSource::Iterator.configure(
@@ -54,37 +53,35 @@ module EventStore
         :get_batch
       end
 
-      handle Messages::GetBatch do |get_batch|
+      handle Messages::GetBatch do
         log_attributes = "#{self.log_attributes}"
 
         verify_dispatcher_queue_depth do |depth, limit|
           logger.debug "Dispatcher queue depth exceeds limit; pausing (#{log_attributes}, Depth: #{depth}, Limit: #{limit})"
           delay
-          return get_batch
+          return :get_batch
         end
 
         logger.trace "Getting batch (#{log_attributes})"
 
-        batch = iterator.next
+        batch = []
 
-        if batch.nil?
-          logger.debug "Get batch returned nothing; retrying (#{log_attributes})"
-          delay
-          return get_batch
+        while event = iterator.next
+          batch << event
         end
 
         if batch.empty?
-          logger.debug "Get batch returned empty set; retrying (#{log_attributes})"
-          return get_batch
+          logger.debug "Get batch returned nothing; retrying (#{log_attributes})"
+          return :get_batch
         end
 
-        logger.debug "Get batch done (#{log_attributes}, EntryCount: #{entries.count})"
+        logger.debug "Get batch done (#{log_attributes}, BatchSize: #{batch.count})"
 
-        Messages::EnqueueBatch.build :batch => batch.reverse
+        Messages::EnqueueBatch.build :batch => batch
       end
 
       handle Messages::EnqueueBatch do |enqueue_batch|
-        log_attributes = "#{self.log_attributes}, EntryCount: #{entries.count})"
+        log_attributes = "#{self.log_attributes}, BatchSize: #{enqueue_batch.batch.count})"
 
         logger.trace "Enqueuing batch (#{log_attributes})"
 
@@ -144,6 +141,12 @@ module EventStore
 
       def log_attributes
         "StreamName: #{iterator.stream_name}, BatchSize: #{get.batch_size}"
+      end
+
+      module Assertions
+        def session?(session)
+          get.session.equal? session
+        end
       end
     end
   end

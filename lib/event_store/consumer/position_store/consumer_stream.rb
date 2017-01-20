@@ -43,13 +43,17 @@ module EventStore
         end
 
         def get
+          position = :no_stream
+
           read.() do |event_data|
             consumer_updated = ::Messaging::Message::Import.(event_data, Messages::ConsumerUpdated)
 
-            return consumer_updated.position
+            position = consumer_updated.position
+
+            break
           end
 
-          return :no_stream
+          position
         end
 
         def put(position)

@@ -8,7 +8,7 @@ module EventStore
             starting_position ||= Position::Initial.example
             starting_global_position ||= starting_position
 
-            entries = (0...entry_count).map do |position|
+            batch = (0...entry_count).map do |position|
               stream_position = starting_position + position
               global_position = starting_global_position + position
 
@@ -19,14 +19,8 @@ module EventStore
               )
             end
 
-            next_slice_uri = StreamReader::SliceURI.example(
-              stream_name,
-              starting_position: starting_position + entry_count
-            )
-
             message = EventStore::Consumer::Messages::EnqueueBatch.new
-            message.entries = entries
-            message.next_slice_uri = next_slice_uri
+            message.batch = batch
             message
           end
         end

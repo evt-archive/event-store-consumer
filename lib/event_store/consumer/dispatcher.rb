@@ -82,9 +82,9 @@ module EventStore
 
       def get_position(event_data)
         if stream_type == :category
-          event_data.position
+          event_data.global_position
         else
-          event_data.number
+          event_data.position
         end
       end
 

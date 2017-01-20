@@ -7,13 +7,13 @@ module EventStore
 
           ending_position = Batch::FinalPosition.example
 
-          writer = Messaging::EventStore::Write.build
+          write = ::EventSource::EventStore::HTTP::Write.build
 
           batch = (0..ending_position).map do |position|
             EventData::Write.example position: position
           end
 
-          writer.(batch, stream_name)
+          write.(batch, stream_name)
 
           stream_name
         end

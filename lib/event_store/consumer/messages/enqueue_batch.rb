@@ -8,6 +8,8 @@ module EventStore
         attribute :batch, Array, default: ->{ Array.new }
 
         def each(&block)
+          return to_enum :each unless block_given?
+
           batch.each &block
         end
       end

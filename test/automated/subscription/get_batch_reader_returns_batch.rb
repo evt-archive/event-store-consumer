@@ -3,11 +3,10 @@ require_relative '../automated_init'
 context "Subscription, Get Batch is Handled and Stream Reader Returns Batch" do
   stream_name = Controls::Write.()
 
-  get_batch = Controls::Messages::GetBatch.example stream_name
-
   subscription = EventStore::Consumer::Subscription.new stream_name
+  EventSource::EventStore::HTTP::Get.configure subscription, batch_size: 1
 
-  next_message = subscription.handle get_batch
+  next_message = subscription.handle :get_batch
 
   test "EnqueueBatch is sent to actor" do
     assert subscription.send do

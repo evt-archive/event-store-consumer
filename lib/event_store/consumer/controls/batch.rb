@@ -18,6 +18,13 @@ module EventStore
 
             start_position + batch_size - 1
           end
+
+          module Next
+            def self.example(batch_index=nil)
+              position = FinalPosition.example
+              position + 1
+            end
+          end
         end
       end
     end

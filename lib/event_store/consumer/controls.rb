@@ -15,7 +15,6 @@ require 'event_store/consumer/controls/batch'
 require 'event_store/consumer/controls/message'
 require 'event_store/consumer/controls/messages/dispatch_event'
 require 'event_store/consumer/controls/messages/enqueue_batch'
-require 'event_store/consumer/controls/messages/get_batch'
 require 'event_store/consumer/controls/messages/consumer_updated'
 
 require 'event_store/consumer/controls/messaging_dispatcher/handler'

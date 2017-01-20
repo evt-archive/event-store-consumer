@@ -34,7 +34,7 @@ module EventStore
       def self.cycle_maximum_milliseconds
         long_poll_duration = ENV['LONG_POLL_DURATION']
 
-        return (long_poll_duration * 1000).to_i if long_poll_duration
+        return long_poll_duration.to_i * 1000 if long_poll_duration
 
         1_000
       end

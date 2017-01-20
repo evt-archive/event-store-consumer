@@ -9,8 +9,9 @@ module EventStore
 
           type = Type.example
           data = Data.example stream_position: stream_position
+          metadata = Metadata.example stream_position: stream_position
 
-          event_data = EventSource::Controls::EventData::Read.example data: data, type: type
+          event_data = EventSource::Controls::EventData::Read.example data: data, metadata: metadata, type: type
           event_data.position = stream_position
           event_data.global_position = global_position
           event_data.stream_name = stream_name
@@ -22,6 +23,14 @@ module EventStore
             stream_position ||= Position.example
 
             { some_attribute: "some value @#{stream_position}" }
+          end
+        end
+
+        module Metadata
+          def self.example(stream_position: nil)
+            stream_position ||= Position.example
+
+            { some_meta_attribute: "some metadata value @#{stream_position}" }
           end
         end
 

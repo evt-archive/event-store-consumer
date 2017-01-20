@@ -4,17 +4,23 @@ context "Subscription, Iterator is Configured" do
   message = Actor::Messages::Start
   stream_name = Controls::StreamName.example
 
+  dispatcher_address = Controls::Address.example
+
   context do
-    subscription = EventStore::Consumer::Subscription.new stream_name
+    subscription = EventStore::Consumer::Subscription.build(
+      stream_name,
+      dispatcher_address,
+      batch_size: Controls::Batch::Size.example
+    )
 
     iterator = subscription.iterator
 
-    test "Stream offset is configured" do
-      assert iterator.stream_offset == nil
+    test "Stream offset is set to start of stream" do
+      assert iterator.stream_offset == 0
     end
 
     test "Batch size is configured" do
-      assert iterator.get.batch_size == Controls::Batch.size
+      assert iterator.get.batch_size == Controls::Batch::Size.example
     end
 
     test "Long polling is enabled" do
@@ -27,8 +33,11 @@ context "Subscription, Iterator is Configured" do
   context "Session is supplied to subscription" do
     session = EventSource::EventStore::HTTP::Session.build
 
-    subscription = EventStore::Consumer::Subscription.new stream_name
-    subscription.session = session
+    subscription = EventStore::Consumer::Subscription.build(
+      stream_name,
+      dispatcher_address,
+      session: session
+    )
 
     test "Session of subscription is supplied to get" do
       assert subscription.iterator do |iterator|
@@ -42,7 +51,7 @@ context "Subscription, Iterator is Configured" do
     subscription.position_store.get_position = 11
 
     test "Iterator stream offset is set to that of consumer position" do
-      assert iterator.steram_offest == 11
+      assert subscription.iterator.stream_offset == 11
     end
   end
 end

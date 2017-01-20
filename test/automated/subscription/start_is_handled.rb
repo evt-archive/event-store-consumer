@@ -9,6 +9,6 @@ context "Subscription, Start Message is Handled" do
   next_message = subscription.handle message
 
   test "GetBatch message is written to actor" do
-    assert next_message == Controls::Messages::GetBatch.example
+    assert next_message == :get_batch
   end
 end
