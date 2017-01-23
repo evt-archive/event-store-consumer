@@ -57,7 +57,6 @@ module EventStore
           get,
           position: starting_position
         )
-        subscription.dispatcher_address = dispatcher.address
       end
     end
 
