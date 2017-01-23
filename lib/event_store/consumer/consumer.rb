@@ -29,14 +29,6 @@ module EventStore
       return subscription, dispatcher
     end
 
-    def consumer_stream_name
-      StreamName.consumer_stream_name stream.name
-    end
-
-    def position_update_interval
-      @position_update_interval ||= self.class.position_update_interval
-    end
-
     module Configure
       def configure(batch_size: nil, session: nil)
         super if defined? super
@@ -61,7 +53,7 @@ module EventStore
           messaging_dispatcher,
           error_handler: error_handler,
           position_store: position_store,
-          position_update_interval: position_update_interval
+          position_update_interval: self.class.position_update_interval
         )
 
         Subscription.configure(
