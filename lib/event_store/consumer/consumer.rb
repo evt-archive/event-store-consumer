@@ -11,6 +11,8 @@ module EventStore
 
         extend ::Consumer::PositionStoreMacro
 
+        prepend Configure
+
         initializer :stream
 
         attr_writer :position_update_interval
@@ -34,26 +36,28 @@ module EventStore
       end
     end
 
-    def configure(batch_size: nil, session: nil)
-      super if defined? super
-
-      position_store_class = self.class.position_store_class
-
-      self.batch_size = batch_size
-
-      unless position_store_class.nil?
-        position_store = self.class.position_store_class.configure self, stream.name
-
-        starting_position = position_store.get
-      end
-
-      EventSource::EventStore::HTTP::Session.configure self, session: session
-
-      self.class.messaging_dispatcher_class.configure self, attr_name: :messaging_dispatcher
-    end
-
     def position_update_interval
       @position_update_interval ||= self.class.position_update_interval
+    end
+
+    module Configure
+      def configure(batch_size: nil, session: nil)
+        super if defined? super
+
+        position_store_class = self.class.position_store_class
+
+        self.batch_size = batch_size
+
+        unless position_store_class.nil?
+          position_store = self.class.position_store_class.configure self, stream.name
+
+          starting_position = position_store.get
+        end
+
+        EventSource::EventStore::HTTP::Session.configure self, session: session
+
+        self.class.messaging_dispatcher_class.configure self, attr_name: :messaging_dispatcher
+      end
     end
 
     module Module
