@@ -7,12 +7,9 @@ module EventStore
         include ::Log::Dependency
         include Module
 
-        extend BatchSizeMacro
-        extend CategoryMacro
         extend DispatcherMacro
         extend PositionStoreMacro
         extend PositionUpdateIntervalMacro
-        extend StreamMacro
 
         extend ::Consumer::Build
         extend Start
@@ -33,6 +30,8 @@ module EventStore
     end
 
     def configure(batch_size: nil, session: nil)
+      self.batch_size = batch_size
+
       self.class.position_store_class.configure self, stream.name
 
       EventSource::EventStore::HTTP::Session.configure self, session: session
@@ -41,8 +40,10 @@ module EventStore
     end
 
     module Module
+      attr_writer :batch_size
+
       def batch_size
-        self.class.default_batch_size
+        @batch_size ||= Defaults.batch_size
       end
 
       def handle_error(error)
@@ -83,19 +84,6 @@ module EventStore
 
       def consumer_stream_name
         StreamName.consumer_stream_name stream_name
-      end
-    end
-
-    module BatchSizeMacro
-      def batch_size_macro(size)
-        define_singleton_method :default_batch_size do
-          size
-        end
-      end
-      alias_method :batch_size, :batch_size_macro
-
-      def default_batch_size
-        Defaults.batch_size
       end
     end
 

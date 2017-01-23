@@ -9,7 +9,6 @@ module EventStore
         class Example
           include EventStore::Consumer
 
-          category Category.example
           dispatcher MessagingDispatcher::Example
         end
       end
