@@ -4,16 +4,10 @@ context "Subscription, Iterator is Configured" do
   message = Actor::Messages::Start
   stream_name = Controls::StreamName.example
 
-  dispatcher_address = Controls::Address.example
-
   get = EventSource::EventStore::HTTP::Get.build batch_size: 1
 
   context do
-    subscription = EventStore::Consumer::Subscription.build(
-      stream_name,
-      get,
-      dispatcher_address
-    )
+    subscription = EventStore::Consumer::Subscription.build stream_name, get
 
     iterator = subscription.iterator
 

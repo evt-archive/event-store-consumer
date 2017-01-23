@@ -51,13 +51,13 @@ module EventStore
           session: session
         )
 
-        Subscription.configure(
+        subscription = Subscription.configure(
           self,
           stream_name,
           get,
-          dispatcher.address,
           position: starting_position
         )
+        subscription.dispatcher_address = dispatcher.address
       end
     end
 

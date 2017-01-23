@@ -16,15 +16,8 @@ module EventStore
       dependency :dispatcher_address, Actor::Messaging::Address
       dependency :kernel, Kernel
 
-      def self.build(stream_name, get, dispatcher_address, position: nil)
-        instance = new stream_name, get
-        instance.position = position if position
-
-        instance.dispatcher_address = dispatcher_address
-
-        Kernel.configure instance
-
-        instance
+      def configure
+        Kernel.configure self
       end
 
       handle Actor::Messages::Start do
