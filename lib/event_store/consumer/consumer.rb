@@ -79,12 +79,6 @@ module EventStore
     end
 
     module Module
-      attr_writer :batch_size
-
-      def batch_size
-        @batch_size ||= Defaults.batch_size
-      end
-
       def handle_error(error)
         raise error
       end
