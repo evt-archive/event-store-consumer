@@ -5,38 +5,55 @@ module EventStore
 
       cls.class_exec do
         include ::Log::Dependency
-        include Module
-
-        extend DispatcherMacro
-        extend PositionStoreMacro
-        extend PositionUpdateIntervalMacro
 
         extend ::Consumer::Build
-        extend Start
+        extend ::Consumer::Run
+
+        extend ::Consumer::PositionStoreMacro
 
         initializer :stream
+
+        attr_writer :position_update_interval
 
         attr_accessor :cycle_timeout_milliseconds
         attr_accessor :cycle_maximum_milliseconds
 
-        dependency :messaging_dispatcher, EventStore::Messaging::Dispatcher
         dependency :position_store, PositionStore
+
+
+        extend Start
+
+        include Module
+
+        extend DispatcherMacro
+
+        dependency :messaging_dispatcher, EventStore::Messaging::Dispatcher
         dependency :session, EventSource::EventStore::HTTP::Session
 
         attr_writer :stream_name
-
-        virtual :position_update_interval
       end
     end
 
     def configure(batch_size: nil, session: nil)
+      super if defined? super
+
+      position_store_class = self.class.position_store_class
+
       self.batch_size = batch_size
 
-      self.class.position_store_class.configure self, stream.name
+      unless position_store_class.nil?
+        position_store = self.class.position_store_class.configure self, stream.name
+
+        starting_position = position_store.get
+      end
 
       EventSource::EventStore::HTTP::Session.configure self, session: session
 
       self.class.messaging_dispatcher_class.configure self, attr_name: :messaging_dispatcher
+    end
+
+    def position_update_interval
+      @position_update_interval ||= self.class.position_update_interval
     end
 
     module Module
@@ -107,31 +124,9 @@ module EventStore
       alias_method :dispatcher, :dispatcher_macro
     end
 
-    module PositionStoreMacro
-      attr_writer :position_store_class
-
-      def position_store_macro(position_store_class)
-        self.position_store_class = position_store_class
-      end
-      alias_method :position_store, :position_store_macro
-
-      def position_store_class
-        @position_store_class ||= PositionStore::ConsumerStream
-      end
-    end
-
-    module PositionUpdateIntervalMacro
-      def position_update_interval_macro(interval)
-        define_method :position_update_interval do
-          interval
-        end
-      end
-      alias_method :position_update_interval, :position_update_interval_macro
-    end
-
     module Start
-      def start(stream_name, session: nil)
-        instance = build stream_name, session: session
+      def start(stream_name, **arguments, &probe)
+        instance = build stream_name, **arguments
 
         actors = instance.start
 

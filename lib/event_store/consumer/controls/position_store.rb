@@ -4,6 +4,9 @@ module EventStore
       module PositionStore
         class Example
           include EventStore::Consumer::PositionStore
+
+          def get
+          end
         end
       end
     end
