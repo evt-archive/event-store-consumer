@@ -17,6 +17,8 @@ module EventStore
         extend Build
         extend Start
 
+        initializer :stream
+
         dependency :messaging_dispatcher, EventStore::Messaging::Dispatcher
         dependency :position_store, PositionStore
         dependency :session, EventSource::EventStore::HTTP::Session
@@ -66,7 +68,7 @@ module EventStore
       end
 
       def stream_name
-        @stream_name ||= self.class.stream_name
+        stream.name
       end
 
       def consumer_stream_name
@@ -89,9 +91,11 @@ module EventStore
 
     module Build
       def build(stream_name=nil, session: nil)
-        instance = new
+        stream_name ||= self.stream_name
 
-        instance.stream_name = stream_name if stream_name
+        stream = EventSource::Stream.canonize stream_name
+
+        instance = new stream
 
         position_store_class.configure instance, instance.stream_name
         messaging_dispatcher_class.configure instance, attr_name: :messaging_dispatcher
