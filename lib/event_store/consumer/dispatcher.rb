@@ -4,6 +4,8 @@ module EventStore
       include Actor
       include Log::Dependency
 
+      configure :dispatcher
+
       attr_writer :error_handler
       attr_writer :position_update_interval
 

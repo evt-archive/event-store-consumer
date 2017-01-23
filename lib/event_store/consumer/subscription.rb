@@ -4,6 +4,8 @@ module EventStore
       include Actor
       include Log::Dependency
 
+      configure :subscription
+
       attr_writer :batch_size
       attr_writer :dispatcher_queue_depth_limit
       attr_writer :iterator

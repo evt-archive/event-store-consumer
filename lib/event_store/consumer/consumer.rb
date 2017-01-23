@@ -29,6 +29,7 @@ module EventStore
 
         extend DispatcherMacro
 
+        dependency :dispatcher, Dispatcher
         dependency :messaging_dispatcher, EventStore::Messaging::Dispatcher
         dependency :session, EventSource::EventStore::HTTP::Session
 
@@ -46,17 +47,26 @@ module EventStore
 
         position_store_class = self.class.position_store_class
 
-        self.batch_size = batch_size
-
         unless position_store_class.nil?
           position_store = self.class.position_store_class.configure self, stream.name
 
           starting_position = position_store.get
         end
 
-        EventSource::EventStore::HTTP::Session.configure self, session: session
+        messaging_dispatcher = self.class.messaging_dispatcher_class.configure self, attr_name: :messaging_dispatcher
+        error_handler = method(:handle_error).to_proc
+        Dispatcher.configure(
+          self,
+          stream_name,
+          messaging_dispatcher,
+          error_handler: error_handler,
+          position_store: position_store,
+          position_update_interval: position_update_interval
+        )
 
-        self.class.messaging_dispatcher_class.configure self, attr_name: :messaging_dispatcher
+        self.batch_size = batch_size
+
+        EventSource::EventStore::HTTP::Session.configure self, session: session
       end
     end
 
@@ -74,16 +84,9 @@ module EventStore
       def start
         logger.trace "Starting consumer (StreamName: #{stream_name}, Dispatcher: #{messaging_dispatcher.class})"
 
-        error_handler = method(:handle_error).to_proc
+        dispatcher_address = dispatcher.address
 
-        dispatcher_address, dispatcher = Dispatcher.start(
-          stream_name,
-          messaging_dispatcher,
-          error_handler: error_handler,
-          position_store: position_store,
-          position_update_interval: position_update_interval,
-          include: :actor
-        )
+        Actor::Start.(dispatcher)
 
         _, subscription = Subscription.start(
           stream_name,
