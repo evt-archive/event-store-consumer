@@ -2,7 +2,7 @@ require_relative '../automated_init'
 
 context "Consumer Position Store Macro" do
   consumer_class = Class.new do
-    include Consumer
+    include EventStore::Consumer
 
     dispatcher Controls::MessagingDispatcher::Example
     stream :some_stream

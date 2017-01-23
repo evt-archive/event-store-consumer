@@ -2,7 +2,7 @@ require_relative '../automated_init'
 
 context "Consumer Batch Size Macro" do
   consumer_class = Class.new do
-    include Consumer
+    include EventStore::Consumer
 
     batch_size 11
     dispatcher Controls::MessagingDispatcher::Example

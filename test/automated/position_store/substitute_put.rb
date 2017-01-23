@@ -1,7 +1,7 @@
 require_relative '../automated_init'
 
 context "Substitute Position Store, Put" do
-  substitute = SubstAttr::Substitute.build PositionStore
+  substitute = SubstAttr::Substitute.build EventStore::Consumer::PositionStore
 
   context "Put operation is not actuated" do
     test "Put predicate returns false" do

@@ -3,7 +3,7 @@ require_relative '../automated_init'
 context "Consumer Stream Macro" do
   context "Singleton stream is specified" do
     consumer_class = Class.new do
-      include Consumer
+      include EventStore::Consumer
 
       stream :some_stream
       dispatcher Controls::MessagingDispatcher::Example
@@ -22,7 +22,7 @@ context "Consumer Stream Macro" do
 
   context "Stream is specified" do
     consumer_class = Class.new do
-      include Consumer
+      include EventStore::Consumer
 
       stream 'someStream-1'
       dispatcher Controls::MessagingDispatcher::Example

@@ -1,7 +1,7 @@
 require_relative '../automated_init'
 
 context "Substitute Position Store, Get" do
-  substitute = SubstAttr::Substitute.build PositionStore
+  substitute = SubstAttr::Substitute.build EventStore::Consumer::PositionStore
 
   context "Position is not specified" do
     position = substitute.get

@@ -2,7 +2,7 @@ require_relative '../automated_init'
 
 context "Consumer Category Macro" do
   consumer_class = Class.new do
-    include Consumer
+    include EventStore::Consumer
 
     category :some_category
     dispatcher Controls::MessagingDispatcher::Example

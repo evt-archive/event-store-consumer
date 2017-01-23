@@ -7,7 +7,7 @@ context "Dispatcher Determines EventData Position" do
   )
 
   context "Category is being consumed" do
-    dispatcher = Dispatcher.new :category
+    dispatcher = EventStore::Consumer::Dispatcher.new :category
 
     position = dispatcher.get_position(event_data)
 
@@ -17,7 +17,7 @@ context "Dispatcher Determines EventData Position" do
   end
 
   context "Stream is being consumed" do
-    dispatcher = Dispatcher.new :stream
+    dispatcher = EventStore::Consumer::Dispatcher.new :stream
 
     position = dispatcher.get_position(event_data)
 
