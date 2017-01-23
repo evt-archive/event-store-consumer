@@ -5,11 +5,10 @@ context "Consumer Position Update Interval Macro" do
     include EventStore::Consumer
 
     dispatcher Controls::MessagingDispatcher::Example
-    stream :some_stream
     position_update_interval 111
   end
 
-  consumer = consumer_class.build
+  consumer = consumer_class.build 'someStream'
 
   context "Consumer is started" do
     subscription, dispatcher = consumer.start

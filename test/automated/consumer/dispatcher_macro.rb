@@ -5,11 +5,10 @@ context "Consumer Dispatcher Macro" do
     include EventStore::Consumer
 
     dispatcher Controls::MessagingDispatcher::Example
-    stream :some_stream
   end
 
   context "Consumer is started" do
-    _, _, dispatcher = consumer_class.start
+    _, _, dispatcher = consumer_class.start 'someStream'
 
     test "Dispatcher dependency is configured to use specfied messaging dispatcher" do
       assert dispatcher.messaging_dispatcher.instance_of?(Controls::MessagingDispatcher::Example)

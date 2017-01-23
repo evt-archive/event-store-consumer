@@ -6,10 +6,9 @@ context "Consumer Batch Size Macro" do
 
     batch_size 11
     dispatcher Controls::MessagingDispatcher::Example
-    stream :some_stream
   end
 
-  consumer = consumer_class.build
+  consumer = consumer_class.build 'someStream'
 
   subscription, _ = consumer.start
 

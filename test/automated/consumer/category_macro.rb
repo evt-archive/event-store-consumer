@@ -4,11 +4,10 @@ context "Consumer Category Macro" do
   consumer_class = Class.new do
     include EventStore::Consumer
 
-    category :some_category
     dispatcher Controls::MessagingDispatcher::Example
   end
 
-  consumer = consumer_class.build
+  consumer = consumer_class.build 'someCategory'
 
   test "Specified value is converted to a camel cased category stream name" do
     assert consumer.stream_name == '$ce-someCategory'

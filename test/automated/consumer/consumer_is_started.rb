@@ -3,7 +3,7 @@ require_relative '../automated_init'
 context "Consumer is Started" do
   consumer_class = Controls::Consumer::Example
 
-  consumer = consumer_class.build
+  consumer = consumer_class.build 'someStream'
 
   subscription, dispatcher = consumer.start
 

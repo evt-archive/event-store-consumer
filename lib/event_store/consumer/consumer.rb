@@ -14,10 +14,13 @@ module EventStore
         extend PositionUpdateIntervalMacro
         extend StreamMacro
 
-        extend Build
+        extend ::Consumer::Build
         extend Start
 
         initializer :stream
+
+        attr_accessor :cycle_timeout_milliseconds
+        attr_accessor :cycle_maximum_milliseconds
 
         dependency :messaging_dispatcher, EventStore::Messaging::Dispatcher
         dependency :position_store, PositionStore
@@ -29,8 +32,12 @@ module EventStore
       end
     end
 
-    def configure
+    def configure(batch_size: nil, session: nil)
       self.class.position_store_class.configure self, stream.name
+
+      EventSource::EventStore::HTTP::Session.configure self, session: session
+
+      self.class.messaging_dispatcher_class.configure self, attr_name: :messaging_dispatcher
     end
 
     module Module
@@ -71,7 +78,7 @@ module EventStore
       end
 
       def stream_name
-        stream.name
+        @stream_name ||= EventSource::EventStore::HTTP::StreamName.canonize stream.name
       end
 
       def consumer_stream_name
@@ -89,23 +96,6 @@ module EventStore
 
       def default_batch_size
         Defaults.batch_size
-      end
-    end
-
-    module Build
-      def build(stream_name=nil, session: nil)
-        stream_name ||= self.stream_name
-
-        stream = EventSource::Stream.canonize stream_name
-
-        instance = new stream
-
-        messaging_dispatcher_class.configure instance, attr_name: :messaging_dispatcher
-        EventSource::EventStore::HTTP::Session.configure instance, session: session
-
-        instance.configure
-
-        instance
       end
     end
 
@@ -152,8 +142,8 @@ module EventStore
     end
 
     module Start
-      def start(session: nil)
-        instance = build session: session
+      def start(stream_name, session: nil)
+        instance = build stream_name, session: session
 
         actors = instance.start
 

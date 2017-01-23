@@ -5,15 +5,10 @@ context "Consumer Stream Macro" do
     consumer_class = Class.new do
       include EventStore::Consumer
 
-      stream :some_stream
       dispatcher Controls::MessagingDispatcher::Example
     end
 
-    consumer = consumer_class.build
-
-    test "Specified value is converted to a camel cased stream name" do
-      assert consumer.stream_name == 'someStream'
-    end
+    consumer = consumer_class.build 'someStream'
 
     test "Consumer stream name" do
       assert consumer.consumer_stream_name == 'someStream:consumer'
@@ -24,11 +19,10 @@ context "Consumer Stream Macro" do
     consumer_class = Class.new do
       include EventStore::Consumer
 
-      stream 'someStream-1'
       dispatcher Controls::MessagingDispatcher::Example
     end
 
-    consumer = consumer_class.build
+    consumer = consumer_class.build 'someStream-1'
 
     test "Specified value is converted to a camel cased stream name" do
       assert consumer.stream_name == 'someStream-1'

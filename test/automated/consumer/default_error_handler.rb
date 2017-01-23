@@ -7,10 +7,9 @@ context "Consumer Default Error Handler" do
     include EventStore::Consumer
 
     dispatcher Controls::MessagingDispatcher::Example
-    stream :some_stream
   end
 
-  consumer = consumer_class.build
+  consumer = consumer_class.build 'someStrem'
 
   context "Error handler is actuated" do
     test "Error is reraised" do

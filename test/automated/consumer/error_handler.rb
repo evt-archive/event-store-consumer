@@ -7,7 +7,6 @@ context "Consumer Error Handler" do
     include EventStore::Consumer
 
     dispatcher Controls::MessagingDispatcher::Example
-    stream :some_stream
 
     attr_accessor :handled_error
 
@@ -21,7 +20,7 @@ context "Consumer Error Handler" do
   end
 
   context "Consumer is started" do
-    consumer, _, dispatcher = consumer_class.start
+    consumer, _, dispatcher = consumer_class.start 'someStream'
 
     test "Error handler is supplied to dispatcher" do
       dispatcher.error_handler.(error)
