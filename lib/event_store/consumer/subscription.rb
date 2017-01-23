@@ -17,8 +17,8 @@ module EventStore
       dependency :kernel, Kernel
       dependency :position_store, ::Consumer::PositionStore
 
-      def self.build(stream_name, dispatcher_address, batch_size: nil, position_store: nil, session: nil)
-        long_poll_duration = Rational(Defaults.cycle_maximum_milliseconds, 1000).ceil
+      def self.build(stream_name, dispatcher_address, position: nil, batch_size: nil, session: nil)
+        long_poll_duration = Rational(::Consumer::Subscription::Defaults.cycle_maximum_milliseconds, 1000).ceil
 
         get = EventSource::EventStore::HTTP::Get.build(
           batch_size: batch_size,
@@ -29,7 +29,6 @@ module EventStore
         instance = new stream_name, get
 
         instance.dispatcher_address = dispatcher_address
-        instance.position_store = position_store if position_store
 
         Kernel.configure instance
 
@@ -112,10 +111,6 @@ module EventStore
         duration = Defaults.no_stream_delay_duration_seconds
 
         kernel.sleep duration
-      end
-
-      def cycle_maximum_milliseconds
-        @cycle_maximum_milliseconds ||= Defaults.cycle_maximum_milliseconds
       end
 
       def dispatcher_queue_depth_limit

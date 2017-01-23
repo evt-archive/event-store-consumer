@@ -49,9 +49,10 @@ module EventStore
           self,
           stream_name,
           dispatcher.address,
+          position: starting_position,
+
           batch_size: batch_size,
-          session: session,
-          position_store: position_store
+          session: session
         )
       end
     end
