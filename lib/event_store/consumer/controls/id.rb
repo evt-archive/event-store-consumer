@@ -1,7 +1,7 @@
 module EventStore
   module Consumer
     module Controls
-      ID = ::Messaging::Controls::ID
+      ID = ::Identifier::UUID::Controls::Incrementing
     end
   end
 end

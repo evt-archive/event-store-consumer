@@ -6,12 +6,17 @@ stream_position = 0
 global_position = 0
 
 if ENV['CATEGORY'] == 'on'
-  category, _ = StreamName.split stream_name
+  formatted_stream_name = stream_name.gsub /^\$ce-/, ''
+
+  category = Messaging::StreamName.get_category formatted_stream_name
   stream_ids = (1..4).map do |i|
     Controls::ID.example i
   end
 else
-  category, *stream_ids = StreamName.split stream_name
+  category = Messaging::StreamName.get_category stream_name
+  id = Messaging::StreamName.get_id stream_name
+
+  stream_ids = Array(id)
 end
 
 write = Messaging::EventStore::Write.build
@@ -21,6 +26,8 @@ period ||= 200
 period_seconds = Rational(period.to_i, 1000)
 
 batch_size = 25
+
+logger = Log.get __FILE__
 
 loop do
   stream_ids.each do |stream_id|
@@ -42,6 +49,8 @@ loop do
     stream_name = ::Messaging::StreamName.stream_name stream_id, category
 
     write.(batch, stream_name, expected_version: expected_version)
+
+    logger.info "Wrote batch (Stream: #{stream_name}, ExpectedVersion: #{expected_version})"
 
     sleep period_seconds
   end
