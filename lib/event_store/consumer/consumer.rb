@@ -29,6 +29,7 @@ module EventStore
 
         extend DispatcherMacro
 
+        dependency :subscription, Subscription
         dependency :dispatcher, Dispatcher
         dependency :messaging_dispatcher, EventStore::Messaging::Dispatcher
         dependency :session, EventSource::EventStore::HTTP::Session
@@ -53,6 +54,8 @@ module EventStore
           starting_position = position_store.get
         end
 
+        session = EventSource::EventStore::HTTP::Session.configure self, session: session
+
         messaging_dispatcher = self.class.messaging_dispatcher_class.configure self, attr_name: :messaging_dispatcher
         error_handler = method(:handle_error).to_proc
         Dispatcher.configure(
@@ -64,9 +67,14 @@ module EventStore
           position_update_interval: position_update_interval
         )
 
-        self.batch_size = batch_size
-
-        EventSource::EventStore::HTTP::Session.configure self, session: session
+        Subscription.configure(
+          self,
+          stream_name,
+          dispatcher.address,
+          batch_size: batch_size,
+          session: session,
+          position_store: position_store
+        )
       end
     end
 
@@ -84,18 +92,8 @@ module EventStore
       def start
         logger.trace "Starting consumer (StreamName: #{stream_name}, Dispatcher: #{messaging_dispatcher.class})"
 
-        dispatcher_address = dispatcher.address
-
         Actor::Start.(dispatcher)
-
-        _, subscription = Subscription.start(
-          stream_name,
-          dispatcher_address,
-          batch_size: batch_size,
-          session: session,
-          position_store: position_store,
-          include: :actor
-        )
+        Actor::Start.(subscription)
 
         logger.info "Consumer started (StreamName: #{stream_name}, Dispatcher: #{messaging_dispatcher.class})"
 
