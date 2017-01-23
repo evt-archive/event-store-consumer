@@ -18,7 +18,7 @@ module EventStore
         attr_accessor :cycle_timeout_milliseconds
         attr_accessor :cycle_maximum_milliseconds
 
-        dependency :position_store, PositionStore
+        dependency :position_store, ::Consumer::PositionStore
 
 
         extend Start

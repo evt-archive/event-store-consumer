@@ -8,7 +8,7 @@ module EventStore
       attr_writer :position_update_interval
 
       dependency :messaging_dispatcher, ::EventStore::Messaging::Dispatcher
-      dependency :position_store, PositionStore
+      dependency :position_store, ::Consumer::PositionStore
 
       initializer :stream_type
 

@@ -1,13 +1,13 @@
 require_relative '../automated_init'
 
 context "Substitute Position Store, Get" do
-  substitute = SubstAttr::Substitute.build EventStore::Consumer::PositionStore
+  substitute = SubstAttr::Substitute.build Consumer::PositionStore
 
   context "Position is not specified" do
     position = substitute.get
 
-    test "No stream is returned" do
-      assert position == :no_stream
+    test "Nothing is returned" do
+      assert position == nil
     end
   end
 

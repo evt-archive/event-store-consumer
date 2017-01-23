@@ -13,9 +13,7 @@ require 'event_store/consumer/messages/enqueue_batch'
 require 'event_store/consumer/messages/get_batch'
 require 'event_store/consumer/stream_name'
 
-require 'event_store/consumer/position_store'
 require 'event_store/consumer/position_store/consumer_stream'
-require 'event_store/consumer/position_store/substitute'
 
 require 'event_store/consumer/dispatcher'
 require 'event_store/consumer/subscription'

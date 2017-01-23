@@ -2,7 +2,7 @@ module EventStore
   module Consumer
     module PositionStore
       class ConsumerStream
-        include PositionStore
+        include ::Consumer::PositionStore
 
         initializer :stream_name
 

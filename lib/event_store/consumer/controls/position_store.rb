@@ -3,7 +3,7 @@ module EventStore
     module Controls
       module PositionStore
         class Example
-          include EventStore::Consumer::PositionStore
+          include ::Consumer::PositionStore
 
           def get
           end

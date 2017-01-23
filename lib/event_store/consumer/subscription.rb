@@ -20,7 +20,7 @@ module EventStore
       dependency :dispatcher_address, Actor::Messaging::Address
       dependency :get, EventSource::EventStore::HTTP::Get
       dependency :kernel, Kernel
-      dependency :position_store, PositionStore
+      dependency :position_store, ::Consumer::PositionStore
 
       initializer :stream_name
 
