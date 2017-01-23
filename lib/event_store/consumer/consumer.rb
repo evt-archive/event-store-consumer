@@ -18,17 +18,6 @@ module EventStore
       end
     end
 
-    def start
-      logger.trace "Starting consumer (StreamName: #{stream.name}, Dispatcher: #{messaging_dispatcher.class})"
-
-      Actor::Start.(dispatcher)
-      Actor::Start.(subscription)
-
-      logger.info "Consumer started (StreamName: #{stream.name}, Dispatcher: #{messaging_dispatcher.class})"
-
-      return subscription, dispatcher
-    end
-
     module Configure
       def configure(batch_size: nil, session: nil)
         super if defined? super
@@ -80,9 +69,10 @@ module EventStore
       def start(stream_name, **arguments, &probe)
         instance = build stream_name, **arguments
 
-        actors = instance.start
+        Actor::Start.(instance.subscription)
+        Actor::Start.(instance.dispatcher)
 
-        return instance, *actors
+        return instance, instance.subscription, instance.dispatcher
       end
     end
   end
