@@ -38,6 +38,10 @@ module EventStore
       end
     end
 
+    def error_raised(error, _)
+      raise error
+    end
+
     def position_update_interval
       @position_update_interval ||= self.class.position_update_interval
     end
@@ -57,7 +61,7 @@ module EventStore
         session = EventSource::EventStore::HTTP::Session.configure self, session: session
 
         messaging_dispatcher = self.class.messaging_dispatcher_class.configure self, attr_name: :messaging_dispatcher
-        error_handler = method(:handle_error).to_proc
+        error_handler = method(:error_raised).to_proc
         Dispatcher.configure(
           self,
           stream_name,
@@ -79,10 +83,6 @@ module EventStore
     end
 
     module Module
-      def handle_error(error)
-        raise error
-      end
-
       def start
         logger.trace "Starting consumer (StreamName: #{stream_name}, Dispatcher: #{messaging_dispatcher.class})"
 

@@ -12,8 +12,10 @@ context "Consumer Default Error Handler" do
   consumer = consumer_class.build 'someStrem'
 
   context "Error handler is actuated" do
+    message = Controls::Message.example
+
     test "Error is reraised" do
-      assert proc { consumer.handle_error error } do
+      assert proc { consumer.error_raised error, message } do
         raises_error? Controls::Error::Example
       end
     end

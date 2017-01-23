@@ -10,7 +10,7 @@ context "Consumer Error Handler" do
 
     attr_accessor :handled_error
 
-    def handle_error(error)
+    def error_raised(error)
       self.handled_error = error
     end
 
