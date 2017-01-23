@@ -9,13 +9,12 @@ module EventStore
           self,
           get,
           stream_name,
-          position: starting_position
+          position: position
         )
       end
 
       dependency :dispatcher_address, Actor::Messaging::Address
       dependency :kernel, Kernel
-      dependency :position_store, ::Consumer::PositionStore
 
       def self.build(stream_name, dispatcher_address, position: nil, batch_size: nil, session: nil)
         long_poll_duration = Rational(::Consumer::Subscription::Defaults.cycle_maximum_milliseconds, 1000).ceil
@@ -27,6 +26,7 @@ module EventStore
         )
 
         instance = new stream_name, get
+        instance.position = position if position
 
         instance.dispatcher_address = dispatcher_address
 
@@ -94,16 +94,6 @@ module EventStore
           block.(depth, limit)
         else
           logger.debug "Dispatcher queue depth within limit (#{log_attributes}, Depth: #{depth}, Limit: #{limit})"
-        end
-      end
-
-      def starting_position
-        starting_position = position_store.get
-
-        if starting_position == :no_stream
-          nil
-        else
-          starting_position
         end
       end
 

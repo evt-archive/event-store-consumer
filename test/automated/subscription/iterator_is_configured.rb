@@ -50,7 +50,7 @@ context "Subscription, Iterator is Configured" do
     get = EventSource::EventStore::HTTP::Get.build batch_size: 1
 
     subscription = EventStore::Consumer::Subscription.new stream_name, get
-    subscription.position_store.get_position = 11
+    subscription.position = 11
 
     test "Iterator stream offset is set to that of consumer position" do
       assert subscription.iterator.stream_offset == 11

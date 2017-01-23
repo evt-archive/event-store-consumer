@@ -6,7 +6,7 @@ context "Subscription, Get Batch is Handled and Stream Reader Returns Empty Batc
   get = EventSource::EventStore::HTTP::Get.build batch_size: 1
 
   subscription = EventStore::Consumer::Subscription.new stream_name, get
-  subscription.position_store.get_position = Controls::Batch::FinalPosition::Next.example
+  subscription.position = Controls::Batch::FinalPosition::Next.example
 
   next_message = subscription.handle :get_batch
 
