@@ -45,14 +45,18 @@ module EventStore
           position_update_interval: self.class.position_update_interval
         )
 
+        get = EventSource::EventStore::HTTP::Get.build(
+          batch_size: Defaults.batch_size,
+          long_poll_duration: 1,
+          session: session
+        )
+
         Subscription.configure(
           self,
           stream_name,
+          get,
           dispatcher.address,
-          position: starting_position,
-
-          batch_size: batch_size,
-          session: session
+          position: starting_position
         )
       end
     end

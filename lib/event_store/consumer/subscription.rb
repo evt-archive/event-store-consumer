@@ -16,15 +16,7 @@ module EventStore
       dependency :dispatcher_address, Actor::Messaging::Address
       dependency :kernel, Kernel
 
-      def self.build(stream_name, dispatcher_address, position: nil, batch_size: nil, session: nil)
-        long_poll_duration = Rational(::Consumer::Subscription::Defaults.cycle_maximum_milliseconds, 1000).ceil
-
-        get = EventSource::EventStore::HTTP::Get.build(
-          batch_size: batch_size,
-          long_poll_duration: long_poll_duration,
-          session: session
-        )
-
+      def self.build(stream_name, get, dispatcher_address, position: nil)
         instance = new stream_name, get
         instance.position = position if position
 
