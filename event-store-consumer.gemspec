@@ -15,6 +15,7 @@ Gem::Specification.new do |s|
 
   s.add_runtime_dependency 'ntl-actor'
 
+  s.add_runtime_dependency 'evt-consumer-event_store'
   s.add_runtime_dependency 'evt-messaging-event_store'
   s.add_runtime_dependency 'event_store-messaging', '>= 0.7.0.0.pre1'
 
