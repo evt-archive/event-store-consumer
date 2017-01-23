@@ -7,13 +7,16 @@ context "Consumer Dispatcher Macro" do
     dispatcher Controls::MessagingDispatcher::Example
   end
 
-  context "Consumer is started" do
-    consumer, _ = consumer_class.start 'someStream'
+  consumer, _ = consumer_class.build 'someStream'
 
-    dispatcher = consumer.dispatch
+  dispatch = consumer.dispatch
 
-    test "Dispatcher dependency is configured to use specfied messaging dispatcher" do
-      assert dispatcher.messaging_dispatcher.instance_of?(Controls::MessagingDispatcher::Example)
+  test "Dispatch hanlder registry includes an instance of the dispatcher" do
+    dispatcher = dispatch.handler_registry.entries.find do |handle|
+      handle.is_a? EventStore::Consumer::Dispatcher and
+        handle.is_a? Controls::MessagingDispatcher::Example
     end
+
+    assert dispatcher
   end
 end
