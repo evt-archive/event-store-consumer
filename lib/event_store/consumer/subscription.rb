@@ -1,12 +1,6 @@
 module EventStore
   module Consumer
-    class Subscription
-      include Actor
-      include Log::Dependency
-
-      configure :subscription
-
-      attr_writer :batch_size
+    class Subscription < ::Consumer::Subscription
       attr_writer :dispatcher_queue_depth_limit
       attr_writer :iterator
 
@@ -20,28 +14,19 @@ module EventStore
       end
 
       dependency :dispatcher_address, Actor::Messaging::Address
-      dependency :get, EventSource::EventStore::HTTP::Get
       dependency :kernel, Kernel
       dependency :position_store, ::Consumer::PositionStore
 
-      initializer :stream_name
-
       def self.build(stream_name, dispatcher_address, batch_size: nil, position_store: nil, session: nil)
-        instance = new stream_name
+        long_poll_duration = Rational(Defaults.cycle_maximum_milliseconds, 1000).ceil
 
-        cycle = Cycle.build(
-          maximum_milliseconds: Defaults.cycle_maximum_milliseconds,
-          timeout_milliseconds: Defaults.cycle_maximum_milliseconds
-        )
-
-        long_poll_duration = Rational(cycle.maximum_milliseconds, 1000).ceil
-
-        EventSource::EventStore::HTTP::Get.configure(
-          instance,
+        get = EventSource::EventStore::HTTP::Get.build(
           batch_size: batch_size,
           long_poll_duration: long_poll_duration,
           session: session
         )
+
+        instance = new stream_name, get
 
         instance.dispatcher_address = dispatcher_address
         instance.position_store = position_store if position_store

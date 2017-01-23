@@ -6,7 +6,9 @@ context "Subscription, EnqueueBatch Message is Handled" do
 
   dispatcher_address = Controls::Address.example
 
-  subscription = EventStore::Consumer::Subscription.new stream_name
+  get = EventSource::EventStore::HTTP::Get.build
+
+  subscription = EventStore::Consumer::Subscription.new stream_name, get
   subscription.dispatcher_address = dispatcher_address
 
   subscription.handle message

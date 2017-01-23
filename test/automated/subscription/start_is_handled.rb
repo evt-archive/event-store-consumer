@@ -4,7 +4,9 @@ context "Subscription, Start Message is Handled" do
   message = Actor::Messages::Start
   stream_name = Controls::StreamName.example
 
-  subscription = EventStore::Consumer::Subscription.new stream_name
+  get = EventSource::EventStore::HTTP::Get.build batch_size: 1
+
+  subscription = EventStore::Consumer::Subscription.new stream_name, get
 
   next_message = subscription.handle message
 

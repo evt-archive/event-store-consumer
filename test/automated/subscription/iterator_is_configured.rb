@@ -47,7 +47,9 @@ context "Subscription, Iterator is Configured" do
   end
 
   context "Consumer position has been previously recorded" do
-    subscription = EventStore::Consumer::Subscription.new stream_name
+    get = EventSource::EventStore::HTTP::Get.build batch_size: 1
+
+    subscription = EventStore::Consumer::Subscription.new stream_name, get
     subscription.position_store.get_position = 11
 
     test "Iterator stream offset is set to that of consumer position" do
