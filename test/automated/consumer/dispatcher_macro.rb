@@ -8,7 +8,9 @@ context "Consumer Dispatcher Macro" do
   end
 
   context "Consumer is started" do
-    _, _, dispatcher = consumer_class.start 'someStream'
+    consumer, _ = consumer_class.start 'someStream'
+
+    dispatcher = consumer.dispatch
 
     test "Dispatcher dependency is configured to use specfied messaging dispatcher" do
       assert dispatcher.messaging_dispatcher.instance_of?(Controls::MessagingDispatcher::Example)
