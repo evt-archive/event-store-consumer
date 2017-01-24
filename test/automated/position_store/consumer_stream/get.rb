@@ -7,7 +7,7 @@ context "Consumer Stream Position Store, Get Operation" do
     position = EventStore::Consumer::PositionStore::ConsumerStream.get stream_name
 
     test "No stream is returned" do
-      assert position == :no_stream
+      assert position == nil
     end
   end
 
