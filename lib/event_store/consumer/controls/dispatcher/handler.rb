@@ -4,8 +4,8 @@ module EventStore
       module MessagingDispatcher
         module Handler
           class Example
-            include ::Log::Dependency
             include EventStore::Messaging::Handler
+            include ::Log::Dependency
 
             handle Message::ExampleMessage do |msg|
               logger.info "Handled message (MessageStreamPosition: #{msg.stream_position}, MessageGlobalPosition: #{msg.global_position})"
@@ -13,8 +13,8 @@ module EventStore
           end
 
           class Failure
-            include ::Log::Dependency
             include EventStore::Messaging::Handler
+            include ::Log::Dependency
 
             handle Message::ExampleMessage do |msg|
               logger.error "Raising error (MessageStreamPosition: #{msg.stream_position.inspect}, MessageGlobalPosition: #{msg.global_position.inspect})"
@@ -24,8 +24,8 @@ module EventStore
           end
 
           class VerifySequence
-            include ::Log::Dependency
             include EventStore::Messaging::Handler
+            include ::Log::Dependency
 
             handle Message::ExampleMessage do |msg, event_data|
               log_attributes = "MessageStreamPosition: #{msg.stream_position}, MessageGlobalPosition: #{msg.global_position}, EventDataStreamPosition: #{event_data.position}, EventDataGlobalPosition: #{event_data.global_position}"

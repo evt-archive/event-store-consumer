@@ -4,12 +4,11 @@ module Fixtures
   class Consumer
     include EventStore::Consumer
 
-    stream get_stream_name
-    position_update_interval 1000
+    position_store ::EventStore::Consumer::PositionStore::ConsumerStream, update_interval: 5
 
     class Handler
-      include Log::Dependency
       include EventStore::Messaging::Handler
+      include ::Log::Dependency
 
       handle Controls::Message::ExampleMessage do |msg|
         logger.info "Handled message (MessageStreamPosition: #{msg.stream_position}, MessageGlobalPosition: #{msg.global_position})"
@@ -50,7 +49,8 @@ module Fixtures
     include ProcessHost::Process
 
     def start
-      Consumer.start
+      stream = get_stream_name
+      Consumer.start stream
     end
   end
 end
