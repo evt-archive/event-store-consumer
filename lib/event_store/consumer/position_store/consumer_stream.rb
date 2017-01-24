@@ -4,27 +4,29 @@ module EventStore
       class ConsumerStream
         include ::Consumer::PositionStore
 
-        initializer :stream_name
-
         dependency :read, EventSource::EventStore::HTTP::Read
         dependency :session, EventSource::EventStore::HTTP::Session
         dependency :write, ::Messaging::EventStore::Write
 
-        def self.build(stream_name, session: nil)
-          consumer_stream_name = StreamName.consumer_stream_name stream_name
+        def self.build(stream, session: nil)
+          stream = EventSource::Stream.canonize stream
 
-          instance = new consumer_stream_name
+          consumer_stream_name = StreamName.consumer_stream_name stream.name
+
+          stream = EventSource::Stream.canonize consumer_stream_name
+
+          instance = new stream
           instance.configure session: session
           instance
         end
 
-        def self.get(stream_name, session: nil)
-          instance = build stream_name, session: session
+        def self.get(stream, session: nil)
+          instance = build stream, session: session
           instance.get
         end
 
-        def self.put(stream_name, position, session: nil)
-          instance = build stream_name, session: session
+        def self.put(stream, position, session: nil)
+          instance = build stream, session: session
           instance.put position
         end
 
@@ -33,7 +35,7 @@ module EventStore
 
           EventSource::EventStore::HTTP::Read.configure(
             self,
-            stream_name,
+            stream.name,
             precedence: :desc,
             batch_size: 1,
             session: session
@@ -43,24 +45,22 @@ module EventStore
         end
 
         def get
-          position = :no_stream
-
           read.() do |event_data|
             consumer_updated = ::Messaging::Message::Import.(event_data, Messages::ConsumerUpdated)
 
-            position = consumer_updated.position
+            return consumer_updated.position
 
             break
           end
 
-          position
+          nil
         end
 
         def put(position)
           message = Messages::ConsumerUpdated.build
           message.position = position
 
-          write.(message, stream_name)
+          write.(message, stream.name)
 
           message
         end

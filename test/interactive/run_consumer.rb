@@ -4,16 +4,16 @@ module Fixtures
   class Consumer
     include EventStore::Consumer
 
-    stream get_stream_name
     dispatcher Controls::MessagingDispatcher::VerifySequence
-    position_update_interval 5
+    position_store ::EventStore::Consumer::PositionStore::ConsumerStream, update_interval: 5
   end
 
   class Process
     include ProcessHost::Process
 
     def start
-      Consumer.start
+      stream = get_stream_name
+      Consumer.start stream
     end
   end
 end

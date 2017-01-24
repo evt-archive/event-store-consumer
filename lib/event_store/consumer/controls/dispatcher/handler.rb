@@ -28,9 +28,9 @@ module EventStore
             include EventStore::Messaging::Handler
 
             handle Message::ExampleMessage do |msg, event_data|
-              log_attributes = "MessageStreamPosition: #{msg.stream_position}, MessageGlobalPosition: #{msg.global_position}, EventDataStreamPosition: #{event_data.number}, EventDataGlobalPosition: #{event_data.position}"
+              log_attributes = "MessageStreamPosition: #{msg.stream_position}, MessageGlobalPosition: #{msg.global_position}, EventDataStreamPosition: #{event_data.position}, EventDataGlobalPosition: #{event_data.global_position}"
 
-              if event_data.number == msg.stream_position && event_data.position == msg.global_position
+              if event_data.position == msg.stream_position && event_data.global_position == msg.global_position
                 logger.info "Handled message (#{log_attributes})"
               else
                 error_message = "Messages out of order #{log_attributes}"
